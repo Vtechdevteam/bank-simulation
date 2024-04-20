@@ -1,8 +1,49 @@
+import { useEffect, useState } from "react"
 import React from "react";
-import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, Button } from "@nextui-org/react";
-import ActionTable from "@/features/action-table";
+import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, DropdownItem, DropdownTrigger, Dropdown, DropdownMenu, Avatar } from "@nextui-org/react";
+import { Card, CardHeader, CardBody, CardFooter, Button } from "@nextui-org/react";
+import { Accordion, AccordionItem } from "@nextui-org/react";
+import Router from "next/router";
+import Page1 from "@/component/page1";
+import Page2 from "@/component/page2";
+import Page3 from "@/component/page3";
+import Page4 from "@/component/page4";
+import Page5 from "@/component/page5";
 
-export default function App() {
+
+
+export interface Settings {
+  numberOfMonths: number
+  creditCardMinDuePercentage: number
+  creditCardLateFee: number
+  creditCardAPR: number
+  creditCardPenaltyAPR: number
+  loanLateFee: number
+  loanAPR: number
+  loanPenaltyAPR: number
+  financeData: FinanceDaum[]
+}
+
+export interface FinanceDaum {
+  sequenceNumber: number
+  initalPayout: number
+  secondPayout: number
+  creditCardDue: number
+  loanDue: number
+  expenses?: number
+}
+
+
+const Settings = () => {
+
+  const [page, setPage] = useState<number>(1)
+  useEffect(() => {
+    init()
+  }, [])
+  const init = async () => {
+
+  }
+
   return (
     <>
       <Navbar>
@@ -15,17 +56,93 @@ export default function App() {
               fillRule="evenodd"
             />
           </svg>
-          <p className="font-bold text-inherit">iManage</p>
+          <p className="font-bold text-inherit">Budget Genius </p>
         </NavbarBrand>
-        <NavbarContent justify="end">
+
+        <NavbarContent className="hidden sm:flex gap-4" justify="center">
+          <NavbarItem >
+            <Link color="foreground" href="#">
+              Home
+            </Link>
+          </NavbarItem>
+          <NavbarItem isActive>
+            <Link color="foreground" href="#">
+              Settings
+            </Link>
+          </NavbarItem>
+          <NavbarItem >
+            <Link href="#" color="foreground" aria-current="page">
+              Users
+            </Link>
+          </NavbarItem>
           <NavbarItem>
-            <Button as={Link} color="primary" href="#" variant="flat">
-              Admin
-            </Button>
+            <Link color="foreground" href="#">
+              Integrations
+            </Link>
           </NavbarItem>
         </NavbarContent>
+
+        <NavbarContent as="div" justify="end">
+          <Dropdown placement="bottom-end">
+            <DropdownTrigger>
+              <Avatar
+                isBordered
+                as="button"
+                className="transition-transform"
+                color="secondary"
+                name="Jason Hughes"
+                size="sm"
+                src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
+              />
+            </DropdownTrigger>
+            <DropdownMenu aria-label="Profile Actions" variant="flat">
+              <DropdownItem key="profile" className="h-14 gap-2">
+                <p className="font-semibold">Signed in as</p>
+                <p className="font-semibold">zoey@example.com</p>
+              </DropdownItem>
+              <DropdownItem key="settings">My Settings</DropdownItem>
+              <DropdownItem key="team_settings">Team Settings</DropdownItem>
+              <DropdownItem key="analytics">Analytics</DropdownItem>
+              <DropdownItem key="system">System</DropdownItem>
+              <DropdownItem key="configurations">Configurations</DropdownItem>
+              <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
+              <DropdownItem key="logout" color="danger">
+                Log Out
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+        </NavbarContent>
       </Navbar>
-      <ActionTable />
+
+
+
+      <div className="w-full h-screen bg-white">
+        <div className="w-full flex justify-center mx-9 px-8 py-5 text-black">
+          <div className="w-2/3 rounded-md shadow-lg px-6 py-4 my-8">
+          <h1 className="text-2xl font-semibold py-4">Budget Genius — The Economic Allocation Simulation</h1>
+
+            {page === 1 && (
+              <Page1 setPage={(page: number) => { setPage(page) }} />
+            )}
+             {page === 2 && (
+              <Page2 setPage={(page: number) => { setPage(page) }} />
+            )}
+             {page === 3 && (
+              <Page3 setPage={(page: number) => { setPage(page) }} />
+            )}
+             {page === 4 && (
+              <Page4 setPage={(page: number) => { setPage(page) }} />
+            )}
+            {page === 5 && (
+              <Page5 setPage={(page: number) => { setPage(page) }} />
+            )}
+          </div>
+        </div>
+
+      </div>
     </>
-  );
+  )
+
+
 }
+export default Settings

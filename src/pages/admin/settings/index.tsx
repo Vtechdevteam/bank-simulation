@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react"
 import React from "react";
-import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, DropdownItem, DropdownTrigger, Dropdown, DropdownMenu, Avatar } from "@nextui-org/react";
+import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, DropdownItem, DropdownTrigger, Dropdown, DropdownMenu, Avatar, Spinner } from "@nextui-org/react";
 import { Card, CardHeader, CardBody, CardFooter, Button } from "@nextui-org/react";
 import { Accordion, AccordionItem } from "@nextui-org/react";
 import Router from "next/router";
-
-
+import { GlobalDataService } from "@/services/globalDataService";
 
 export interface Settings {
     numberOfMonths: number
@@ -21,7 +20,7 @@ export interface Settings {
 
 export interface FinanceDaum {
     sequenceNumber: number
-    initalPayout: number
+    initialPayout: number
     secondPayout: number
     creditCardDue: number
     loanDue: number
@@ -33,8 +32,8 @@ const Settings = () => {
 
     const [data, setData] = useState<Settings>()
     const [isAdd, setIsAdd] = useState<boolean>(false)
-    const defaultContent =
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
+    const [isPageLoading, setIsPageLoading] = useState<boolean>(false)
+
     useEffect(() => {
         init()
     }, [])
@@ -42,48 +41,19 @@ const Settings = () => {
 
         await getSettingsData()
     }
-    const getSettingsData = () => {
+    const getSettingsData = async () => {
+        setIsPageLoading(true)
         try {
-            setData({
-                "numberOfMonths": 3,
-                "creditCardMinDuePercentage": 10,
-                "creditCardLateFee": 25,
-                "creditCardAPR": 22,
-                "creditCardPenaltyAPR": 27,
-                "loanLateFee": 29,
-                "loanAPR": 26,
-                "loanPenaltyAPR": 31,
-                "financeData": [
-                    {
-                        "sequenceNumber": 1,
-                        "initalPayout": 1500,
-                        "secondPayout": 1000,
-                        "creditCardDue": 600,
-                        "loanDue": 600
-                    },
-                    {
-                        "sequenceNumber": 2,
-                        "initalPayout": 1500,
-                        "secondPayout": 1000,
-                        "creditCardDue": 600,
-                        "loanDue": 600,
-                        "expenses": 1000
-                    },
-                    {
-                        "sequenceNumber": 3,
-                        "initalPayout": 1500,
-                        "secondPayout": 1000,
-                        "creditCardDue": 600,
-                        "loanDue": 600,
-                        "expenses": 1000
-                    }
-                ]
-            })
+            const res: any = await GlobalDataService?.getGlobalDataData()
+            console.log('Data', res?.data)
+            setData(res?.data)
+
 
         }
         catch (e) {
             console.log(e)
         }
+        setIsPageLoading(false)
     }
     return (
         <>
@@ -158,14 +128,14 @@ const Settings = () => {
 
 
             <div className="w-full h-screen bg-white">
-                <div className="lg:flex lg:items-center lg:justify-between border border-b-1 shadow-md py-4">
+                <div className="flex items-center justify-between border border-b-1 shadow-md py-4">
                     <div className="min-w-0 flex-1">
                         <h2 className="py-2 pl-9 text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
                             Settings        </h2>
 
                     </div>
                     <div className="mt-5 pr-9 flex lg:ml-4 lg:mt-0">
-                        <Button color="primary" onClick={()=>{
+                        <Button color="primary" size="sm" onClick={() => {
                             Router?.push('/admin/settings/addUpdate')
                         }}>
                             + Add/Update
@@ -175,82 +145,98 @@ const Settings = () => {
                     </div>
                 </div>
                 <div className="mx-9 my-2 text-black">
-                    <div className="flex w-full justify-between px-8">
-                        <div className="w-1/2">
-                            <div className="grid grid-cols-2 pt-1">
-                                <label className="col-span-1 font-semibold">Credit Card min. due(%)</label>
-                                <label className="col-span-1">{`${data?.creditCardMinDuePercentage} %`}</label>
-                            </div>
-                            <div className="grid grid-cols-2 pt-1">
-                                <label className="col-span-1 font-semibold">Credit Card late fee</label>
-                                <label className="col-span-1">{`${data?.creditCardLateFee}`}</label>
-                            </div>
-                            <div className="grid grid-cols-2 pt-1">
-                                <label className="col-span-1 font-semibold">Credit Card APR(%)</label>
-                                <label className="col-span-1">{`${data?.creditCardAPR} %`}</label>
-                            </div>
-                            <div className="grid grid-cols-2 pt-1">
-                                <label className="col-span-1 font-semibold">Credit Card Penalty-APR</label>
-                                <label className="col-span-1">{`${data?.creditCardPenaltyAPR} `}</label>
-                            </div>
-
+                    {isPageLoading ? (
+                        <div className="flex justify-center mt-8">
+                            <Spinner label="Loading..." color="primary" />
                         </div>
-                        <div className="w-1/2">
-                            <div className="grid grid-cols-2 pt-1">
-                                <label className="col-span-1 font-semibold">Loan late fee</label>
-                                <label className="col-span-1">{`${data?.loanLateFee} `}</label>
+                    ) : (
+                        <>
+                            {data === null?(
+                                <div>
+                                    No Data found Please Add...
+                                </div>
+                            ):(
+                                <>
+                                <div className="md:flex w-full justify-between px-2 md:px-8">
+                                <div className="w-full md:w-1/2">
+                                    <div className="grid grid-cols-3 pt-1">
+                                        <label className="col-span-2 font-semibold">Credit Card min. due(%)</label>
+                                        <label className="col-span-1">{`${data?.creditCardMinDuePercentage} %`}</label>
+                                    </div>
+                                    <div className="grid grid-cols-3 pt-1">
+                                        <label className="col-span-2 font-semibold">Credit Card late fee</label>
+                                        <label className="col-span-1">{`$ ${data?.creditCardLateFee}`}</label>
+                                    </div>
+                                    <div className="grid grid-cols-3 pt-1">
+                                        <label className="col-span-2 font-semibold">Credit Card APR(%)</label>
+                                        <label className="col-span-1">{`${data?.creditCardAPR} %`}</label>
+                                    </div>
+                                    <div className="grid grid-cols-3 pt-1">
+                                        <label className="col-span-2 font-semibold">Credit Card Penalty-APR</label>
+                                        <label className="col-span-1">{`$ ${data?.creditCardPenaltyAPR} `}</label>
+                                    </div>
+
+                                </div>
+                                <div className="w-full md:w-1/2">
+                                    <div className="grid grid-cols-3 pt-1">
+                                        <label className="col-span-2 font-semibold">Loan late fee</label>
+                                        <label className="col-span-1">{`$ ${data?.loanLateFee} `}</label>
+                                    </div>
+                                    <div className="grid grid-cols-3 pt-1">
+                                        <label className="col-span-2 font-semibold">Loan APR</label>
+                                        <label className="col-span-1">{`$ ${data?.loanAPR}`}</label>
+                                    </div>
+
+                                    <div className="grid grid-cols-3 pt-1">
+                                        <label className="col-span-2 font-semibold">Loan Penalty-APR</label>
+                                        <label className="col-span-1">{`$ ${data?.loanPenaltyAPR} `}</label>
+                                    </div>
+
+                                </div>
+
                             </div>
-                            <div className="grid grid-cols-2 pt-1">
-                                <label className="col-span-1 font-semibold">Loan APR</label>
-                                <label className="col-span-1">{`${data?.loanAPR}`}</label>
+                            <div className="mx-5 w-full md:w-1/2 mt-4">
+                                <h4 className="px-2 py-4 text-2xl font-semibold">
+                                    Finacial Data
+                                </h4>
+                                <Accordion isCompact>
+                                    {data?.financeData?.map((each, index) => {
+                                        return (
+                                            <AccordionItem key={index} aria-label={`Month-${each?.sequenceNumber}`} subtitle="Press to expand" title={`Month-${each?.sequenceNumber}`}>
+                                                <div className="w-full md:w-1/2">
+                                                    <div className="grid grid-cols-3 pt-1">
+                                                        <label className="col-span-2 font-semibold">Initial Salary</label>
+                                                        <label className="col-span-1">{`${each?.initialPayout}`}</label>
+                                                    </div>
+                                                    <div className="grid grid-cols-3 pt-1">
+                                                        <label className="col-span-2 font-semibold">Mid-month Salary</label>
+                                                        <label className="col-span-1">{`${each?.secondPayout}`}</label>
+                                                    </div>
+                                                    <div className="grid grid-cols-3 pt-1">
+                                                        <label className="col-span-2 font-semibold">Credit Card Due</label>
+                                                        <label className="col-span-1">{`${each?.creditCardDue}`}</label>
+                                                    </div>
+                                                    <div className="grid grid-cols-3 pt-1">
+                                                        <label className="col-span-2 font-semibold">Loan Due</label>
+                                                        <label className="col-span-1">{`${each?.loanDue} `}</label>
+                                                    </div>
+                                                    {each?.expenses && (
+                                                        <div className="grid grid-cols-3 pt-1">
+                                                            <label className="col-span-2 font-semibold">Previous Month Expenses</label>
+                                                            <label className="col-span-1">{`${each?.expenses} `}</label>
+                                                        </div>
+                                                    )}
+
+                                                </div>                                 </AccordionItem>
+                                        )
+                                    })}
+
+                                </Accordion>
                             </div>
-
-                            <div className="grid grid-cols-2 pt-1">
-                                <label className="col-span-1 font-semibold">Loan Penalty-APR</label>
-                                <label className="col-span-1">{`${data?.loanPenaltyAPR} `}</label>
-                            </div>
-
-                        </div>
-
-                    </div>
-                    <div className="mx-5 w-1/2 mt-4">
-                        <h4 className="px-2 py-4 text-2xl font-semibold">
-                            Finacial Data
-                        </h4>
-                        <Accordion isCompact>
-                            {data?.financeData?.map((each, index) => {
-                                return (
-                                    <AccordionItem key={index} aria-label={`Month-${each?.sequenceNumber}`} subtitle="Press to expand" title={`Month-${each?.sequenceNumber}`}>
-                                        <div className="w-1/2">
-                                            <div className="grid grid-cols-2 pt-1">
-                                                <label className="col-span-1 font-semibold">Initial Salary</label>
-                                                <label className="col-span-1">{`${each?.initalPayout}`}</label>
-                                            </div>
-                                            <div className="grid grid-cols-2 pt-1">
-                                                <label className="col-span-1 font-semibold">Mid-month Salary</label>
-                                                <label className="col-span-1">{`${each?.secondPayout}`}</label>
-                                            </div>
-                                            <div className="grid grid-cols-2 pt-1">
-                                                <label className="col-span-1 font-semibold">Credit Card Due</label>
-                                                <label className="col-span-1">{`${each?.creditCardDue}`}</label>
-                                            </div>
-                                            <div className="grid grid-cols-2 pt-1">
-                                                <label className="col-span-1 font-semibold">Loan Due</label>
-                                                <label className="col-span-1">{`${each?.loanDue} `}</label>
-                                            </div>
-                                            {each?.expenses && (
-                                                <div className="grid grid-cols-2 pt-1">
-                                                <label className="col-span-1 font-semibold">Previous Month Expenses</label>
-                                                <label className="col-span-1">{`${each?.expenses} `}</label>
-                                            </div>
-                                            )}
-
-                                        </div>                                 </AccordionItem>
-                                )
-                            })}
-
-                        </Accordion>
-                    </div>
+                                </>
+                            )}
+                        </>
+                    )}
 
                 </div>
 
