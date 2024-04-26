@@ -1,3 +1,4 @@
+import Router from "next/router"
 
 const Page5 = ({ setPage = async (page: number) => { } }: { setPage: any }) => {
     return (
@@ -42,11 +43,9 @@ const Page5 = ({ setPage = async (page: number) => { } }: { setPage: any }) => {
 
                 }} >{`<- Previous`}</div>
                 <div role="button" className="font-semibold text-blue-600 cursor-pointer px-2" onClick={() => {
-                    setPage(1)
+                    Router.push("/play/1")
                     window.scrollTo(0, 0)
-
-
-                }} >{`Next ->`}</div>
+                }} >{`Start`}</div>
 
             </div>
         </div>

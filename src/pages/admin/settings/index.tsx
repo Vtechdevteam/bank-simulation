@@ -5,6 +5,7 @@ import { Card, CardHeader, CardBody, CardFooter, Button } from "@nextui-org/reac
 import { Accordion, AccordionItem } from "@nextui-org/react";
 import Router from "next/router";
 import { GlobalDataService } from "@/services/globalDataService";
+import Calculator from "@/utils/Calculator";
 
 export interface Settings {
     numberOfMonths: number
@@ -24,7 +25,6 @@ export interface FinanceDaum {
     secondPayout: number
     creditCardDue: number
     loanDue: number
-    expenses?: number
 }
 
 
@@ -67,7 +67,7 @@ const Settings = () => {
                             fillRule="evenodd"
                         />
                     </svg>
-                    <p className="font-bold text-inherit">Simalation Game</p>
+                    <p className="font-bold text-inherit">Simulation Game</p>
                 </NavbarBrand>
 
                 <NavbarContent className="hidden sm:flex gap-4" justify="center">
@@ -136,7 +136,7 @@ const Settings = () => {
                     </div>
                     <div className="mt-5 pr-9 flex lg:ml-4 lg:mt-0">
                         <Button color="primary" size="sm" onClick={() => {
-                            Router?.push('/admin/settings/addUpdate')
+                            Router?.push('/admin/settings/update')
                         }}>
                             + Add/Update
                         </Button>
@@ -151,88 +151,81 @@ const Settings = () => {
                         </div>
                     ) : (
                         <>
-                            {data === null?(
+                            {data === null ? (
                                 <div>
                                     No Data found Please Add...
                                 </div>
-                            ):(
+                            ) : (
                                 <>
-                                <div className="md:flex w-full justify-between px-2 md:px-8">
-                                <div className="w-full md:w-1/2">
-                                    <div className="grid grid-cols-3 pt-1">
-                                        <label className="col-span-2 font-semibold">Credit Card min. due(%)</label>
-                                        <label className="col-span-1">{`${data?.creditCardMinDuePercentage} %`}</label>
-                                    </div>
-                                    <div className="grid grid-cols-3 pt-1">
-                                        <label className="col-span-2 font-semibold">Credit Card late fee</label>
-                                        <label className="col-span-1">{`$ ${data?.creditCardLateFee}`}</label>
-                                    </div>
-                                    <div className="grid grid-cols-3 pt-1">
-                                        <label className="col-span-2 font-semibold">Credit Card APR(%)</label>
-                                        <label className="col-span-1">{`${data?.creditCardAPR} %`}</label>
-                                    </div>
-                                    <div className="grid grid-cols-3 pt-1">
-                                        <label className="col-span-2 font-semibold">Credit Card Penalty-APR</label>
-                                        <label className="col-span-1">{`$ ${data?.creditCardPenaltyAPR} `}</label>
-                                    </div>
+                                    <div className="md:flex w-full justify-between px-2 md:px-8">
+                                        <div className="w-full md:w-1/2">
+                                            <div className="grid grid-cols-3 pt-1">
+                                                <label className="col-span-2 font-semibold">Credit Card late fee</label>
+                                                <label className="col-span-1">{`$ ${data?.creditCardLateFee}`}</label>
+                                            </div>
+                                            <div className="grid grid-cols-3 pt-1">
+                                                <label className="col-span-2 font-semibold">Credit Card APR(%)</label>
+                                                <label className="col-span-1">{`${data?.creditCardAPR} %`}</label>
+                                            </div>
+                                            <div className="grid grid-cols-3 pt-1">
+                                                <label className="col-span-2 font-semibold">Credit Card Penalty-APR</label>
+                                                <label className="col-span-1">{`$ ${data?.creditCardPenaltyAPR} `}</label>
+                                            </div>
 
-                                </div>
-                                <div className="w-full md:w-1/2">
-                                    <div className="grid grid-cols-3 pt-1">
-                                        <label className="col-span-2 font-semibold">Loan late fee</label>
-                                        <label className="col-span-1">{`$ ${data?.loanLateFee} `}</label>
-                                    </div>
-                                    <div className="grid grid-cols-3 pt-1">
-                                        <label className="col-span-2 font-semibold">Loan APR</label>
-                                        <label className="col-span-1">{`$ ${data?.loanAPR}`}</label>
-                                    </div>
+                                        </div>
+                                        <div className="w-full md:w-1/2">
+                                            <div className="grid grid-cols-3 pt-1">
+                                                <label className="col-span-2 font-semibold">Loan late fee</label>
+                                                <label className="col-span-1">{`$ ${data?.loanLateFee} `}</label>
+                                            </div>
+                                            <div className="grid grid-cols-3 pt-1">
+                                                <label className="col-span-2 font-semibold">Loan APR</label>
+                                                <label className="col-span-1">{`$ ${data?.loanAPR}`}</label>
+                                            </div>
 
-                                    <div className="grid grid-cols-3 pt-1">
-                                        <label className="col-span-2 font-semibold">Loan Penalty-APR</label>
-                                        <label className="col-span-1">{`$ ${data?.loanPenaltyAPR} `}</label>
+                                            <div className="grid grid-cols-3 pt-1">
+                                                <label className="col-span-2 font-semibold">Loan Penalty-APR</label>
+                                                <label className="col-span-1">{`$ ${data?.loanPenaltyAPR} `}</label>
+                                            </div>
+
+                                        </div>
+
                                     </div>
-
-                                </div>
-
-                            </div>
-                            <div className="mx-5 w-full md:w-1/2 mt-4">
-                                <h4 className="px-2 py-4 text-2xl font-semibold">
-                                    Finacial Data
-                                </h4>
-                                <Accordion isCompact>
-                                    {data?.financeData?.map((each, index) => {
-                                        return (
-                                            <AccordionItem key={index} aria-label={`Month-${each?.sequenceNumber}`} subtitle="Press to expand" title={`Month-${each?.sequenceNumber}`}>
-                                                <div className="w-full md:w-1/2">
-                                                    <div className="grid grid-cols-3 pt-1">
-                                                        <label className="col-span-2 font-semibold">Initial Salary</label>
-                                                        <label className="col-span-1">{`${each?.initialPayout}`}</label>
-                                                    </div>
-                                                    <div className="grid grid-cols-3 pt-1">
-                                                        <label className="col-span-2 font-semibold">Mid-month Salary</label>
-                                                        <label className="col-span-1">{`${each?.secondPayout}`}</label>
-                                                    </div>
-                                                    <div className="grid grid-cols-3 pt-1">
-                                                        <label className="col-span-2 font-semibold">Credit Card Due</label>
-                                                        <label className="col-span-1">{`${each?.creditCardDue}`}</label>
-                                                    </div>
-                                                    <div className="grid grid-cols-3 pt-1">
-                                                        <label className="col-span-2 font-semibold">Loan Due</label>
-                                                        <label className="col-span-1">{`${each?.loanDue} `}</label>
-                                                    </div>
-                                                    {each?.expenses && (
-                                                        <div className="grid grid-cols-3 pt-1">
-                                                            <label className="col-span-2 font-semibold">Previous Month Expenses</label>
-                                                            <label className="col-span-1">{`${each?.expenses} `}</label>
+                                    <div className="mx-5 w-full md:w-1/2 mt-4">
+                                        <h4 className="px-2 py-4 text-2xl font-semibold">
+                                            Finacial Data
+                                        </h4>
+                                        <Accordion isCompact>
+                                            {data?.financeData?.map((each, index) => {
+                                                return (
+                                                    <AccordionItem key={index} aria-label={`Month-${each?.sequenceNumber}`} subtitle="Press to expand" title={`${each?.sequenceNumber % 2 == 0 ? 'Mid' : 'Begining'} of Month ${Calculator.calculateMonth(each?.sequenceNumber)}`}>
+                                                        <div className="w-full md:w-1/2">
+                                                            <div className="grid grid-cols-3 pt-1">
+                                                                <label className="col-span-2 font-semibold">Initial Salary</label>
+                                                                <label className="col-span-1">{`${each?.initialPayout}`}</label>
+                                                            </div>
+                                                            <div className="grid grid-cols-3 pt-1">
+                                                                <label className="col-span-2 font-semibold">Mid-month Salary</label>
+                                                                <label className="col-span-1">{`${each?.secondPayout}`}</label>
+                                                            </div>
+                                                            <div className="grid grid-cols-3 pt-1">
+                                                                <label className="col-span-2 font-semibold">Credit Card Due</label>
+                                                                <label className="col-span-1">{`${each?.creditCardDue}`}</label>
+                                                            </div>
+                                                            <div className="grid grid-cols-3 pt-1">
+                                                                <label className="col-span-2 font-semibold">Credit Card Min Due</label>
+                                                                <label className="col-span-1">{`${each?.creditCardMinDue} `}</label>
+                                                            </div>
+                                                            <div className="grid grid-cols-3 pt-1">
+                                                                <label className="col-span-2 font-semibold">Loan Due</label>
+                                                                <label className="col-span-1">{`${each?.loanDue} `}</label>
+                                                            </div>
                                                         </div>
-                                                    )}
-
-                                                </div>                                 </AccordionItem>
-                                        )
-                                    })}
-
-                                </Accordion>
-                            </div>
+                                                    </AccordionItem>
+                                                )
+                                            })}
+                                        </Accordion>
+                                    </div>
                                 </>
                             )}
                         </>

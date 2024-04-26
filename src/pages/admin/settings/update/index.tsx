@@ -5,54 +5,28 @@ import { FieldArray, Form, Formik } from "formik";
 import * as Yup from "yup";
 import { GlobalDataService } from "@/services/globalDataService";
 import Router from "next/router";
-
-
-
-
-export interface Settings {
-    numberOfMonths: number | null
-    creditCardMinDuePercentage: number | null
-    creditCardLateFee: number | null
-    creditCardAPR: number | null
-    creditCardPenaltyAPR: number | null
-    loanLateFee: number | null
-    loanAPR: number | null
-    loanPenaltyAPR: number | null
-    financeData: FinanceDaum[]
-}
-
-export interface FinanceDaum {
-    sequenceNumber: number | null
-    initialPayout: number | null
-    secondPayout: number | null
-    creditCardDue: number | null
-    loanDue: number | null
-    expenses?: number | null
-}
+import { FinanceDatum, MasterInformation } from "@/models/Transaction";
 
 
 const AddUpdateSettings = () => {
 
-    const [data, setData] = useState<Settings>()
+    const [data, setData] = useState<MasterInformation>()
     const [isAdd, setIsAdd] = useState<boolean>(false)
     const [isButtonLoading, setIsButtonLoading] = useState<boolean>(false)
     const [id, setId] = useState<string>('')
     const [isPageLoading, setIsPageLoading] = useState<boolean>(false)
-    const [initialValues, setInitialValues] = useState<Settings>({
-        numberOfMonths: null,
-        creditCardMinDuePercentage: null,
-        creditCardLateFee: null,
-        creditCardAPR: null,
-        creditCardPenaltyAPR: null,
-        loanLateFee: null,
-        loanAPR: null,
-        loanPenaltyAPR: null,
+    const [initialValues, setInitialValues] = useState<MasterInformation>({
+        numberOfMonths: undefined,
+        creditCardLateFee: undefined,
+        creditCardAPR: undefined,
+        creditCardPenaltyAPR: undefined,
+        loanLateFee: undefined,
+        loanAPR: undefined,
+        loanPenaltyAPR: undefined,
         financeData: []
     })
     const validationSchema = Yup.object({
         numberOfMonths: Yup.number()
-            .required("This field is required!"),
-        creditCardMinDuePercentage: Yup.number()
             .required("This field is required!"),
         creditCardLateFee: Yup.number()
             .required("This field is required!"),
@@ -80,25 +54,24 @@ const AddUpdateSettings = () => {
             const res: any = await GlobalDataService?.getGlobalDataData()
             console.log('Data', res?.data)
             setId(res?.id)
-            console.log('res?.data',res)
-            if(res !==null){
+            console.log('res?.data', res)
+            if (res !== null) {
                 setData(res?.data)
                 setInitialValues(res?.data)
             }
-            else{
+            else {
                 setInitialValues({
-                    numberOfMonths: null,
-                    creditCardMinDuePercentage: null,
-                    creditCardLateFee: null,
-                    creditCardAPR: null,
-                    creditCardPenaltyAPR: null,
-                    loanLateFee: null,
-                    loanAPR: null,
-                    loanPenaltyAPR: null,
+                    numberOfMonths: undefined,
+                    creditCardLateFee: undefined,
+                    creditCardAPR: undefined,
+                    creditCardPenaltyAPR: undefined,
+                    loanLateFee: undefined,
+                    loanAPR: undefined,
+                    loanPenaltyAPR: undefined,
                     financeData: []
                 })
             }
-           
+
 
 
         }
@@ -108,12 +81,40 @@ const AddUpdateSettings = () => {
         setIsPageLoading(false)
     }
 
-    const submitData = async (values: Settings) => {
+    const submitData = async (values: MasterInformation) => {
         setIsButtonLoading(true)
         try {
-            const body = { ...values }
-            console.log('Body', body)
-            await GlobalDataService?.addGlobalData(body)
+            const formatedFinanceData: FinanceDatum[] = []
+
+            for (var fd of values.financeData ?? []){
+                const firstSequence = (fd.sequenceNumber ?? 0) + ((fd.sequenceNumber ?? 0) - 1)
+                const secondSequence = firstSequence + 1
+
+                const firstElement: FinanceDatum = {
+                    sequenceNumber: firstSequence,
+                    initialPayout:   fd?.initialPayout ?? 0,
+                    creditCardDue:  fd?.creditCardDue ?? 0,
+                    loanDue:        fd?.loanDue ?? 0,
+                    creditCardMinDue: fd?.creditCardMinDue ?? 0,
+                }
+
+                const secondElement: FinanceDatum = {
+                    sequenceNumber: secondSequence,
+                    initialPayout:   fd?.initialPayout ?? 0,
+                    creditCardDue:  0,
+                    loanDue:        0,
+                    creditCardMinDue: 0,
+                }
+
+                formatedFinanceData.push(firstElement, secondElement)
+            } 
+
+            values.financeData = formatedFinanceData
+
+            console.log(values)
+
+
+            await GlobalDataService?.addGlobalData(values)
             Router?.push('/admin/settings')
 
         }
@@ -136,7 +137,7 @@ const AddUpdateSettings = () => {
                             fillRule="evenodd"
                         />
                     </svg>
-                    <p className="font-bold text-inherit">Simalation Game</p>
+                    <p className="font-bold text-inherit">Simulation Game</p>
                 </NavbarBrand>
 
                 <NavbarContent className="hidden sm:flex gap-4" justify="center">
@@ -215,7 +216,7 @@ const AddUpdateSettings = () => {
                         <Formik
                             initialValues={initialValues}
                             validationSchema={validationSchema}
-                            onSubmit={(values: Settings) => {
+                            onSubmit={(values: MasterInformation) => {
                                 submitData(values)
                             }}
                         >
@@ -230,7 +231,7 @@ const AddUpdateSettings = () => {
                                         <>
                                             <div className="w-full px-6 grid grid-cols-1 md:grid-cols-5 gap-4">
                                                 <Input className="" name='numberOfMonths' label="No. of months" variant="bordered"
-                                                    type="number" 
+                                                    type="number"
                                                     value={String(formik?.values?.numberOfMonths)}
                                                     onChange={(e) => {
                                                         formik?.setFieldValue('numberOfMonths', Number(e.target.value))
@@ -238,15 +239,13 @@ const AddUpdateSettings = () => {
                                                         let months = e.target.value
 
                                                         for (let i = 0; i < Number(months); i++) {
-                                                            let obj: FinanceDaum = {
+                                                            let obj: FinanceDatum = {
                                                                 sequenceNumber: i + 1,
-                                                                initialPayout: null,
-                                                                secondPayout: null,
-                                                                loanDue: null,
-                                                                creditCardDue: null
-                                                            }
-                                                            if (i > 0) {
-                                                                obj['expenses'] = 0
+                                                                initialPayout: undefined,
+                                                                secondPayout: undefined,
+                                                                loanDue: undefined,
+                                                                creditCardDue: undefined,
+                                                                creditCardMinDue: undefined
                                                             }
                                                             dataArr.push(obj)
                                                         }
@@ -261,18 +260,6 @@ const AddUpdateSettings = () => {
                                                     isInvalid={isFormFieldValid('numberOfMonths')}
                                                     color={isFormFieldValid('numberOfMonths') ? "danger" : "success"}
                                                     errorMessage={getFormErrorMessage('numberOfMonths')}
-                                                />
-                                                <Input className="" name='creditCardMinDuePercentage' label="Credit Card min due (%)" variant="bordered"
-                                                    type="number" value={String(formik?.values?.creditCardMinDuePercentage)}
-                                                    onChange={formik.handleChange}
-                                                    endContent={
-                                                        <div className="pointer-events-none flex items-center">
-                                                            <span className="text-default-400 text-small">%</span>
-                                                        </div>
-                                                    }
-                                                    isInvalid={isFormFieldValid('creditCardMinDuePercentage')}
-                                                    color={isFormFieldValid('creditCardMinDuePercentage') ? "danger" : "success"}
-                                                    errorMessage={getFormErrorMessage('creditCardMinDuePercentage')}
                                                 />
                                                 <Input className="col-span-1" name='creditCardLateFee' label="Credit Card late fee" variant="bordered"
                                                     type="number" value={String(formik?.values?.creditCardLateFee)}
@@ -350,7 +337,7 @@ const AddUpdateSettings = () => {
 
 
                                             </div>
-                                            {formik?.values?.financeData.length > 0 && (
+                                            {(formik?.values?.financeData?.length ?? 0) > 0 && (
                                                 <h4 className="px-6 py-4 text-2xl font-semibold">
                                                     Finance Data
                                                 </h4>
@@ -421,27 +408,24 @@ const AddUpdateSettings = () => {
                                                                                     color={isFormFieldValid(`financeData[${i}].loanDue`) ? "danger" : "success"}
                                                                                     errorMessage={getFormErrorMessage(`financeData[${i}].loanDue`)}
                                                                                 />
-                                                                                {each?.expenses && (
-                                                                                    <Input className="col-span-1"
-                                                                                        name={`financeData[${i}].expenses`}
-                                                                                        label="Previous Month Expenses" variant="bordered"
-                                                                                        type="number" value={String(formik?.values?.financeData[i]?.expenses)}
-                                                                                        onChange={formik.handleChange}
-                                                                                        startContent={
-                                                                                            <div className="pointer-events-none flex items-center">
-                                                                                                <span className="text-default-400 text-small">$</span>
-                                                                                            </div>
-                                                                                        }
-                                                                                        isInvalid={isFormFieldValid(`financeData[${i}].expenses`)}
-                                                                                        color={isFormFieldValid(`financeData[${i}].expenses`) ? "danger" : "success"}
-                                                                                        errorMessage={getFormErrorMessage(`financeData[${i}].expenses`)}
-                                                                                    />
-                                                                                )}
+                                                                                <Input 
+                                                                                    className="" 
+                                                                                    name={`financeData[${i}].creditCardMinDue`}
+                                                                                    label="Credit Card min due" variant="bordered"
+                                                                                    type="number" 
+                                                                                    value={String(formik?.values?.financeData[i]?.creditCardMinDue)}
+                                                                                    onChange={formik.handleChange}
+                                                                                    endContent={
+                                                                                        <div className="pointer-events-none flex items-center">
+                                                                                            <span className="text-default-400 text-small">$</span>
+                                                                                        </div>
+                                                                                    }
+                                                                                    isInvalid={isFormFieldValid('creditCardMinDuePercentage')}
+                                                                                    color={isFormFieldValid('creditCardMinDuePercentage') ? "danger" : "success"}
+                                                                                    errorMessage={getFormErrorMessage('creditCardMinDuePercentage')}
+                                                                                />
                                                                             </div>
-
-
                                                                         </AccordionItem>
-
                                                                     )
                                                                 })}
                                                             </Accordion>
