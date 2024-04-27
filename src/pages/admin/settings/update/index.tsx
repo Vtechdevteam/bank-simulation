@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import React from "react";
-import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, DropdownItem, DropdownTrigger, Dropdown, DropdownMenu, Avatar, Input, Accordion, AccordionItem, Button, Spinner } from "@nextui-org/react";
+import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, DropdownItem, DropdownTrigger, Dropdown, DropdownMenu, Avatar, Input, Accordion, AccordionItem, Button, Spinner, Card, CardBody, CardHeader } from "@nextui-org/react";
 import { FieldArray, Form, Formik } from "formik";
 import * as Yup from "yup";
 import { GlobalDataService } from "@/services/globalDataService";
@@ -86,28 +86,28 @@ const AddUpdateSettings = () => {
         try {
             const formatedFinanceData: FinanceDatum[] = []
 
-            for (var fd of values.financeData ?? []){
+            for (var fd of values.financeData ?? []) {
                 const firstSequence = (fd.sequenceNumber ?? 0) + ((fd.sequenceNumber ?? 0) - 1)
                 const secondSequence = firstSequence + 1
 
                 const firstElement: FinanceDatum = {
                     sequenceNumber: firstSequence,
-                    initialPayout:   fd?.initialPayout ?? 0,
-                    creditCardDue:  fd?.creditCardDue ?? 0,
-                    loanDue:        fd?.loanDue ?? 0,
+                    initialPayout: fd?.initialPayout ?? 0,
+                    creditCardDue: fd?.creditCardDue ?? 0,
+                    loanDue: fd?.loanDue ?? 0,
                     creditCardMinDue: fd?.creditCardMinDue ?? 0,
                 }
 
                 const secondElement: FinanceDatum = {
                     sequenceNumber: secondSequence,
-                    initialPayout:   fd?.initialPayout ?? 0,
-                    creditCardDue:  0,
-                    loanDue:        0,
+                    initialPayout: fd?.initialPayout ?? 0,
+                    creditCardDue: 0,
+                    loanDue: 0,
                     creditCardMinDue: 0,
                 }
 
                 formatedFinanceData.push(firstElement, secondElement)
-            } 
+            }
 
             values.financeData = formatedFinanceData
 
@@ -346,91 +346,94 @@ const AddUpdateSettings = () => {
                                                 {({ push, remove }) => {
                                                     return (
                                                         <div className="">
-                                                            <Accordion variant="splitted" defaultExpandedKeys={["1"]}>
-
+                                                            <div>
                                                                 {formik?.values?.financeData?.map((each, i) => {
                                                                     return (
-                                                                        <AccordionItem key={each?.sequenceNumber} aria-label={`Month-${each?.sequenceNumber}`} title={`Month-${each?.sequenceNumber}`}>
-                                                                            <div className="w-full px-2 md:px-6 grid grid-cols-1 md:grid-cols-5 gap-4 py-3">
-                                                                                <Input className="col-span-1"
-                                                                                    name={`financeData[${i}].initialPayout`}
-                                                                                    label="Initial Salary" variant="bordered"
-                                                                                    type="number" value={String(formik?.values?.financeData[i]?.initialPayout)}
-                                                                                    onChange={formik.handleChange}
-                                                                                    startContent={
-                                                                                        <div className="pointer-events-none flex items-center">
-                                                                                            <span className="text-default-400 text-small">$</span>
-                                                                                        </div>
-                                                                                    }
-                                                                                    isInvalid={isFormFieldValid(`financeData[${i}].initialPayout`)}
-                                                                                    color={isFormFieldValid(`financeData[${i}].initialPayout`) ? "danger" : "success"}
-                                                                                    errorMessage={getFormErrorMessage(`financeData[${i}].initialPayout`)}
-                                                                                />
-                                                                                <Input className="col-span-1"
-                                                                                    name={`financeData[${i}].secondPayout`}
-                                                                                    label="Mid-month Salary" variant="bordered"
-                                                                                    type="number" value={String(formik?.values?.financeData[i]?.secondPayout)}
-                                                                                    onChange={formik.handleChange}
-                                                                                    startContent={
-                                                                                        <div className="pointer-events-none flex items-center">
-                                                                                            <span className="text-default-400 text-small">$</span>
-                                                                                        </div>
-                                                                                    }
-                                                                                    isInvalid={isFormFieldValid(`financeData[${i}].secondPayout`)}
-                                                                                    color={isFormFieldValid(`financeData[${i}].secondPayout`) ? "danger" : "success"}
-                                                                                    errorMessage={getFormErrorMessage(`financeData[${i}].secondPayout`)}
-                                                                                />
-                                                                                <Input className="col-span-1"
-                                                                                    name={`financeData[${i}].creditCardDue`}
-                                                                                    label="Credit Card Due" variant="bordered"
-                                                                                    type="number" value={String(formik?.values?.financeData[i]?.creditCardDue)}
-                                                                                    onChange={formik.handleChange}
-                                                                                    startContent={
-                                                                                        <div className="pointer-events-none flex items-center">
-                                                                                            <span className="text-default-400 text-small">$</span>
-                                                                                        </div>
-                                                                                    }
-                                                                                    isInvalid={isFormFieldValid(`financeData[${i}].creditCardDue`)}
-                                                                                    color={isFormFieldValid(`financeData[${i}].creditCardDue`) ? "danger" : "success"}
-                                                                                    errorMessage={getFormErrorMessage(`financeData[${i}].creditCardDue`)}
-                                                                                />
-                                                                                <Input className="col-span-1"
-                                                                                    name={`financeData[${i}].loanDue`}
-                                                                                    label="Loan Due" variant="bordered"
-                                                                                    type="number" value={String(formik?.values?.financeData[i]?.loanDue)}
-                                                                                    onChange={formik.handleChange}
-                                                                                    startContent={
-                                                                                        <div className="pointer-events-none flex items-center">
-                                                                                            <span className="text-default-400 text-small">$</span>
-                                                                                        </div>
-                                                                                    }
-                                                                                    isInvalid={isFormFieldValid(`financeData[${i}].loanDue`)}
-                                                                                    color={isFormFieldValid(`financeData[${i}].loanDue`) ? "danger" : "success"}
-                                                                                    errorMessage={getFormErrorMessage(`financeData[${i}].loanDue`)}
-                                                                                />
-                                                                                <Input 
-                                                                                    className="" 
-                                                                                    name={`financeData[${i}].creditCardMinDue`}
-                                                                                    label="Credit Card min due" variant="bordered"
-                                                                                    type="number" 
-                                                                                    value={String(formik?.values?.financeData[i]?.creditCardMinDue)}
-                                                                                    onChange={formik.handleChange}
-                                                                                    endContent={
-                                                                                        <div className="pointer-events-none flex items-center">
-                                                                                            <span className="text-default-400 text-small">$</span>
-                                                                                        </div>
-                                                                                    }
-                                                                                    isInvalid={isFormFieldValid('creditCardMinDuePercentage')}
-                                                                                    color={isFormFieldValid('creditCardMinDuePercentage') ? "danger" : "success"}
-                                                                                    errorMessage={getFormErrorMessage('creditCardMinDuePercentage')}
-                                                                                />
-                                                                            </div>
-                                                                        </AccordionItem>
+                                                                        <Card className="mb-4" key={each?.sequenceNumber} aria-label={`Month-${each?.sequenceNumber}`} title={`Month-${each?.sequenceNumber}`}>
+
+                                                                            <CardBody>
+                                                                                <CardHeader>
+                                                                                    {`Month-${each?.sequenceNumber}`}
+                                                                                </CardHeader>
+                                                                                <div className="w-full px-2 md:px-6 grid grid-cols-1 md:grid-cols-5 gap-4 py-3">
+                                                                                    <Input className="col-span-1"
+                                                                                        name={`financeData[${i}].initialPayout`}
+                                                                                        label="Initial Salary" variant="bordered"
+                                                                                        type="number" value={String(formik?.values?.financeData && formik?.values?.financeData[i]?.initialPayout)}
+                                                                                        onChange={formik.handleChange}
+                                                                                        startContent={
+                                                                                            <div className="pointer-events-none flex items-center">
+                                                                                                <span className="text-default-400 text-small">$</span>
+                                                                                            </div>
+                                                                                        }
+                                                                                        isInvalid={isFormFieldValid(`financeData[${i}].initialPayout`)}
+                                                                                        color={isFormFieldValid(`financeData[${i}].initialPayout`) ? "danger" : "success"}
+                                                                                        errorMessage={getFormErrorMessage(`financeData[${i}].initialPayout`)}
+                                                                                    />
+                                                                                    <Input className="col-span-1"
+                                                                                        name={`financeData[${i}].secondPayout`}
+                                                                                        label="Mid-month Salary" variant="bordered"
+                                                                                        type="number" value={String(formik?.values?.financeData && formik?.values?.financeData[i]?.secondPayout)}
+                                                                                        onChange={formik.handleChange}
+                                                                                        startContent={
+                                                                                            <div className="pointer-events-none flex items-center">
+                                                                                                <span className="text-default-400 text-small">$</span>
+                                                                                            </div>
+                                                                                        }
+                                                                                        isInvalid={isFormFieldValid(`financeData[${i}].secondPayout`)}
+                                                                                        color={isFormFieldValid(`financeData[${i}].secondPayout`) ? "danger" : "success"}
+                                                                                        errorMessage={getFormErrorMessage(`financeData[${i}].secondPayout`)}
+                                                                                    />
+                                                                                    <Input className="col-span-1"
+                                                                                        name={`financeData[${i}].creditCardDue`}
+                                                                                        label="Credit Card Due" variant="bordered"
+                                                                                        type="number" value={String(formik?.values?.financeData && formik?.values?.financeData[i]?.creditCardDue)}
+                                                                                        onChange={formik.handleChange}
+                                                                                        startContent={
+                                                                                            <div className="pointer-events-none flex items-center">
+                                                                                                <span className="text-default-400 text-small">$</span>
+                                                                                            </div>
+                                                                                        }
+                                                                                        isInvalid={isFormFieldValid(`financeData[${i}].creditCardDue`)}
+                                                                                        color={isFormFieldValid(`financeData[${i}].creditCardDue`) ? "danger" : "success"}
+                                                                                        errorMessage={getFormErrorMessage(`financeData[${i}].creditCardDue`)}
+                                                                                    />
+                                                                                    <Input className="col-span-1"
+                                                                                        name={`financeData[${i}].loanDue`}
+                                                                                        label="Loan Due" variant="bordered"
+                                                                                        type="number" value={String(formik?.values?.financeData && formik?.values?.financeData[i]?.loanDue)}
+                                                                                        onChange={formik.handleChange}
+                                                                                        startContent={
+                                                                                            <div className="pointer-events-none flex items-center">
+                                                                                                <span className="text-default-400 text-small">$</span>
+                                                                                            </div>
+                                                                                        }
+                                                                                        isInvalid={isFormFieldValid(`financeData[${i}].loanDue`)}
+                                                                                        color={isFormFieldValid(`financeData[${i}].loanDue`) ? "danger" : "success"}
+                                                                                        errorMessage={getFormErrorMessage(`financeData[${i}].loanDue`)}
+                                                                                    />
+                                                                                    <Input
+                                                                                        className=""
+                                                                                        name={`financeData[${i}].creditCardMinDue`}
+                                                                                        label="Credit Card min due" variant="bordered"
+                                                                                        type="number"
+                                                                                        value={String(formik?.values?.financeData && formik?.values?.financeData[i]?.creditCardMinDue)}
+                                                                                        onChange={formik.handleChange}
+                                                                                        endContent={
+                                                                                            <div className="pointer-events-none flex items-center">
+                                                                                                <span className="text-default-400 text-small">$</span>
+                                                                                            </div>
+                                                                                        }
+                                                                                        isInvalid={isFormFieldValid('creditCardMinDuePercentage')}
+                                                                                        color={isFormFieldValid('creditCardMinDuePercentage') ? "danger" : "success"}
+                                                                                        errorMessage={getFormErrorMessage('creditCardMinDuePercentage')}
+                                                                                    />
+                                                                                </div>
+                                                                            </CardBody>
+                                                                        </Card>
                                                                     )
                                                                 })}
-                                                            </Accordion>
-
-
+                                                            </div>
                                                         </div>)
                                                 }}
                                             </FieldArray>

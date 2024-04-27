@@ -24,6 +24,7 @@ export interface FinanceDaum {
     initialPayout: number
     secondPayout: number
     creditCardDue: number
+    creditCardMinDue: number
     loanDue: number
 }
 
@@ -195,10 +196,13 @@ const Settings = () => {
                                         <h4 className="px-2 py-4 text-2xl font-semibold">
                                             Finacial Data
                                         </h4>
-                                        <Accordion isCompact>
-                                            {data?.financeData?.map((each, index) => {
-                                                return (
-                                                    <AccordionItem key={index} aria-label={`Month-${each?.sequenceNumber}`} subtitle="Press to expand" title={`${each?.sequenceNumber % 2 == 0 ? 'Mid' : 'Begining'} of Month ${Calculator.calculateMonth(each?.sequenceNumber)}`}>
+                                        {data?.financeData?.map((each, index) => {
+                                            return (
+                                                <Card className="mb-2" key={index} aria-label={`Month-${each?.sequenceNumber}`}>
+                                                    <CardHeader>
+                                                        {`${each?.sequenceNumber % 2 == 0 ? 'Mid' : 'Begining'} of Month ${Calculator.calculateMonth(each?.sequenceNumber)}`}
+                                                    </CardHeader>
+                                                    <CardBody>
                                                         <div className="w-full md:w-1/2">
                                                             <div className="grid grid-cols-3 pt-1">
                                                                 <label className="col-span-2 font-semibold">Initial Salary</label>
@@ -221,10 +225,10 @@ const Settings = () => {
                                                                 <label className="col-span-1">{`${each?.loanDue} `}</label>
                                                             </div>
                                                         </div>
-                                                    </AccordionItem>
-                                                )
-                                            })}
-                                        </Accordion>
+                                                    </CardBody>
+                                                </Card>
+                                            )
+                                        })}
                                     </div>
                                 </>
                             )}
