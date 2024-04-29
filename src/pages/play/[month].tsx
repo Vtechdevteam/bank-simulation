@@ -11,8 +11,7 @@ import CacheService from "@/services/CacheService";
 
 const Page1 = () => {
     const [isPageLoading, setIsPageLoading] = useState<boolean>(false)
-    const [error, setError] = useState<string>('')
-
+    const [savingsError, setSavingsError] = useState<string>('')
     const [month, setMonth] = useState<number>(1)
 
     const router = useRouter()
@@ -43,7 +42,19 @@ const Page1 = () => {
         }
     })
 
+    const checkForSavingErrors = () => {
+        if(getSavings() < 0 ){
+            setSavingsError("Saving cannot be negative. You have allocated funds over and above your total available funds. Please adjust the allocations.")
+        }else{
+            setSavingsError("")
+        }
+    }
+
     const submit = (values: any) => {
+        if(getSavings() < 0){
+            checkForSavingErrors()
+            return;
+        }
         const userTransaction = {
             "sequenceNumber": month,
             "creditCardAllocation": getCreditCardAllocation(),
@@ -94,9 +105,10 @@ const Page1 = () => {
     }
 
     function getSavings(): number {
-        return Math.round((((CacheService.getCurrentFinanceData(month)?.initialPayout ?? 0) + (CacheService.getPreviousMonthTransaction(month)?.savings ?? 0)) -
+        const savings =  Math.round((((CacheService.getCurrentFinanceData(month)?.initialPayout ?? 0) + (CacheService.getPreviousMonthTransaction(month)?.savings ?? 0)) -
             (Number(formik.values.creditCardAllocation ?? 0) +
                 Number(formik.values.loanAllocation ?? 0))) * 100) / 100
+        return savings
     }
 
     function getTotalAvailableFunds(): number {
@@ -242,7 +254,10 @@ const Page1 = () => {
                                         <div className="col-span-1 text-start border-2 py-1 px-3">
                                             <Input type="number" placeholder="Enter amount" size="sm" variant={"underlined"}
                                                 name="creditCardAllocation"
-                                                onChange={(e) => { formik.setFieldValue('creditCardAllocation', e.target.value) }}
+                                                onChange={(e) => {
+                                                    formik.setFieldValue('creditCardAllocation', e.target.value)
+                                                    checkForSavingErrors()
+                                                }}
                                                 isInvalid={isFormFieldValid('creditCardAllocation')}
                                                 color={isFormFieldValid('creditCardAllocation') ? "danger" : "success"}
                                                 errorMessage={getFormErrorMessage('creditCardAllocation')}
@@ -262,7 +277,10 @@ const Page1 = () => {
                                         <div className="col-span-1 text-start border-2 py-1 px-3">
                                             <Input type="number" placeholder="Enter amount" size="sm" variant={"underlined"}
                                                 name="loanAllocation"
-                                                onChange={(e) => { formik.setFieldValue('loanAllocation', +e.target.value) }}
+                                                onChange={(e) => {
+                                                    formik.setFieldValue('loanAllocation', +e.target.value)
+                                                    checkForSavingErrors()
+                                                }}
                                                 isInvalid={isFormFieldValid('loanAllocation')}
                                                 color={isFormFieldValid('loanAllocation') ? "danger" : "success"}
                                                 errorMessage={getFormErrorMessage('loanAllocation')}
@@ -290,9 +308,9 @@ const Page1 = () => {
                                     </div>
                                     <div className="grid grid-cols-4">
                                         <label className="col-span-1 font-semibold border-2 border-b-4 py-1 px-3 ">Savings </label>
-                                        <label className="col-span-3 text-start border-2 border-b-4 py-1 px-3">{
-                                            getSavings()
-                                        }</label>
+                                        <label className="col-span-3 text-start border-2 border-b-4 py-1 px-3">{getSavings()}
+                                            {savingsError && (<label className="block text-tiny text-danger">{savingsError}</label>)}
+                                        </label>
                                     </div>
                                 </div>
                                 <div className="w-full pb-4 flex justify-end">

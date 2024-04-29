@@ -101,7 +101,6 @@ const AddUpdateSettings = () => {
             for (var fd of values.financeData ?? []) {
                 const firstSequence = (fd.sequenceNumber ?? 0) + ((fd.sequenceNumber ?? 0) - 1)
                 const secondSequence = firstSequence + 1
-
                 const firstElement: FinanceDatum = {
                     sequenceNumber: firstSequence,
                     initialPayout: fd?.initialPayout ?? 0,
@@ -117,18 +116,13 @@ const AddUpdateSettings = () => {
                     loanDue: 0,
                     creditCardMinDue: 0,
                 }
-
                 formatedFinanceData.push(firstElement, secondElement)
             }
-
-            values.financeData = formatedFinanceData
-
-            console.log(values)
-
-
-            await GlobalDataService?.addGlobalData(values)
-            Router?.push('/admin')
-
+            const newValues = { ...values }
+            newValues.financeData = formatedFinanceData
+            await GlobalDataService?.addGlobalData(newValues)
+            setEditable(false)
+            init()
         }
         catch (e) {
             console.log(e)
@@ -136,7 +130,7 @@ const AddUpdateSettings = () => {
         setIsButtonLoading(false)
     }
 
-    function logout(){
+    function logout() {
         StorageService.logout()
         Router.push("/authenticate")
     }
@@ -162,16 +156,20 @@ const AddUpdateSettings = () => {
                 <div className="lg:flex lg:items-center lg:justify-between border border-b-1 shadow-md py-4">
                     <div className="min-w-0 flex-1">
                         <h2 className="py-2 pl-9 text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-                            Update Settings
+                            Admin Settings
                         </h2>
                     </div>
-                    <div className="mx-8">
-                        <Button
-                            color="primary"
-                            onClick={() => {setEditable(true)}}>
-                            Update
-                        </Button>
-                    </div>
+                    {
+                        !editable && (
+                            <div className="mx-8">
+                                <Button
+                                    color="primary"
+                                    onClick={() => { setEditable(true); alert('You can now update the values. Press submit to save it.') }}>
+                                    Update
+                                </Button>
+                            </div>
+                        )
+                    }
                 </div>
 
                 <div className="mx-9 my-4 text-black">
@@ -413,10 +411,13 @@ const AddUpdateSettings = () => {
                                                         </div>)
                                                 }}
                                             </FieldArray>
-                                            <div className="w-full flex justify-end py-4">
-                                                <Button type="submit" color="primary" isLoading={isButtonLoading}> Submit</Button>
-                                            </div>
-
+                                            {
+                                                editable && (
+                                                    <div className="w-full flex justify-end py-4">
+                                                        <Button type="submit" color="primary" isLoading={isButtonLoading}>Submit</Button>
+                                                    </div>
+                                                )
+                                            }
                                         </>
                                     </Form>
                                 )
