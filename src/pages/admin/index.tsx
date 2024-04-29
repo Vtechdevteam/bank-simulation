@@ -6,6 +6,7 @@ import * as Yup from "yup";
 import { GlobalDataService } from "@/services/globalDataService";
 import Router from "next/router";
 import { FinanceDatum, MasterInformation } from "@/models/Transaction";
+import StorageService from "@/services/StorageService";
 
 
 const AddUpdateSettings = () => {
@@ -13,8 +14,8 @@ const AddUpdateSettings = () => {
     const [data, setData] = useState<MasterInformation>()
     const [isAdd, setIsAdd] = useState<boolean>(false)
     const [isButtonLoading, setIsButtonLoading] = useState<boolean>(false)
-    const [id, setId] = useState<string>('')
     const [isPageLoading, setIsPageLoading] = useState<boolean>(false)
+    const [editable, setEditable] = useState<boolean>(false);
     const [initialValues, setInitialValues] = useState<MasterInformation>({
         numberOfMonths: undefined,
         creditCardLateFee: undefined,
@@ -52,12 +53,26 @@ const AddUpdateSettings = () => {
         setIsPageLoading(true)
         try {
             const res: any = await GlobalDataService?.getGlobalDataData()
-            console.log('Data', res?.data)
-            setId(res?.id)
-            console.log('res?.data', res)
+            const data: MasterInformation = res?.data
+            const financeData: FinanceDatum[] = []
+            for (const fd of data?.financeData ?? []) {
+                const sequenceNumber = Math.ceil((fd.sequenceNumber ?? 0) / 2);
+                if ((fd?.sequenceNumber ?? 0) % 2 == 0)
+                    continue;
+                const element: FinanceDatum = {
+                    sequenceNumber: sequenceNumber,
+                    initialPayout: fd?.initialPayout ?? 0,
+                    creditCardDue: fd?.creditCardDue ?? 0,
+                    loanDue: fd?.loanDue ?? 0,
+                    creditCardMinDue: fd?.creditCardMinDue ?? 0,
+                    secondPayout: data?.financeData?.find(d => d?.sequenceNumber == sequenceNumber + 1)?.initialPayout
+                }
+                financeData.push(element)
+            }
+            data.financeData = financeData
             if (res !== null) {
-                setData(res?.data)
-                setInitialValues(res?.data)
+                setData(data)
+                setInitialValues(data)
             }
             else {
                 setInitialValues({
@@ -71,9 +86,6 @@ const AddUpdateSettings = () => {
                     financeData: []
                 })
             }
-
-
-
         }
         catch (e) {
             console.log(e)
@@ -115,13 +127,18 @@ const AddUpdateSettings = () => {
 
 
             await GlobalDataService?.addGlobalData(values)
-            Router?.push('/admin/settings')
+            Router?.push('/admin')
 
         }
         catch (e) {
             console.log(e)
         }
         setIsButtonLoading(false)
+    }
+
+    function logout(){
+        StorageService.logout()
+        Router.push("/authenticate")
     }
 
 
@@ -137,74 +154,24 @@ const AddUpdateSettings = () => {
                             fillRule="evenodd"
                         />
                     </svg>
-                    <p className="font-bold text-inherit">Simulation Game</p>
+                    <p className="font-bold text-inherit">Budget Genius</p>
                 </NavbarBrand>
-
-                <NavbarContent className="hidden sm:flex gap-4" justify="center">
-                    <NavbarItem >
-                        <Link color="foreground" href="#">
-                            Home
-                        </Link>
-                    </NavbarItem>
-                    <NavbarItem isActive>
-                        <Link color="foreground" href="#">
-                            Settings
-                        </Link>
-                    </NavbarItem>
-                    <NavbarItem >
-                        <Link href="#" color="foreground" aria-current="page">
-                            Users
-                        </Link>
-                    </NavbarItem>
-                    <NavbarItem>
-                        <Link color="foreground" href="#">
-                            Integrations
-                        </Link>
-                    </NavbarItem>
-                </NavbarContent>
-
-                <NavbarContent as="div" justify="end">
-                    <Dropdown placement="bottom-end">
-                        <DropdownTrigger>
-                            <Avatar
-                                isBordered
-                                as="button"
-                                className="transition-transform"
-                                color="secondary"
-                                name="Jason Hughes"
-                                size="sm"
-                                src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
-                            />
-                        </DropdownTrigger>
-                        <DropdownMenu aria-label="Profile Actions" variant="flat">
-                            <DropdownItem key="profile" className="h-14 gap-2">
-                                <p className="font-semibold">Signed in as</p>
-                                <p className="font-semibold">zoey@example.com</p>
-                            </DropdownItem>
-                            <DropdownItem key="settings">My Settings</DropdownItem>
-                            <DropdownItem key="team_settings">Team Settings</DropdownItem>
-                            <DropdownItem key="analytics">Analytics</DropdownItem>
-                            <DropdownItem key="system">System</DropdownItem>
-                            <DropdownItem key="configurations">Configurations</DropdownItem>
-                            <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
-                            <DropdownItem key="logout" color="danger">
-                                Log Out
-                            </DropdownItem>
-                        </DropdownMenu>
-                    </Dropdown>
-                </NavbarContent>
+                <Button color="danger" onClick={logout}>Logout</Button>
             </Navbar>
-
-
-
             <div className="w-full h-screen mb-6 bg-white">
                 <div className="lg:flex lg:items-center lg:justify-between border border-b-1 shadow-md py-4">
                     <div className="min-w-0 flex-1">
                         <h2 className="py-2 pl-9 text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-                            Add/Update        </h2>
-
+                            Update Settings
+                        </h2>
                     </div>
-
+                    <div className="mx-8">
+                        <Button
+                            color="primary"
+                            onClick={() => {setEditable(true)}}>
+                            Update
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="mx-9 my-4 text-black">
@@ -229,9 +196,10 @@ const AddUpdateSettings = () => {
                                 return (
                                     <Form onSubmit={formik.handleSubmit}>
                                         <>
-                                            <div className="w-full px-6 grid grid-cols-1 md:grid-cols-5 gap-4">
+                                            <div className="w-full grid grid-cols-1 md:grid-cols-5 gap-4">
                                                 <Input className="" name='numberOfMonths' label="No. of months" variant="bordered"
                                                     type="number"
+                                                    isReadOnly={!editable}
                                                     value={String(formik?.values?.numberOfMonths)}
                                                     onChange={(e) => {
                                                         formik?.setFieldValue('numberOfMonths', Number(e.target.value))
@@ -264,6 +232,7 @@ const AddUpdateSettings = () => {
                                                 <Input className="col-span-1" name='creditCardLateFee' label="Credit Card late fee" variant="bordered"
                                                     type="number" value={String(formik?.values?.creditCardLateFee)}
                                                     onChange={formik.handleChange}
+                                                    isReadOnly={!editable}
                                                     startContent={
                                                         <div className="pointer-events-none flex items-center">
                                                             <span className="text-default-400 text-small">$</span>
@@ -276,6 +245,7 @@ const AddUpdateSettings = () => {
                                                 <Input className="col-span-1" name='creditCardAPR' label="Credit Card APR (%)" variant="bordered"
                                                     type="number" value={String(formik?.values?.creditCardAPR)}
                                                     onChange={formik.handleChange}
+                                                    isReadOnly={!editable}
                                                     endContent={
                                                         <div className="pointer-events-none flex items-center">
                                                             <span className="text-default-400 text-small">%</span>
@@ -288,6 +258,7 @@ const AddUpdateSettings = () => {
                                                 <Input className="col-span-1" name='creditCardPenaltyAPR' label="Credit Card Penalty APR (%)" variant="bordered"
                                                     type="number" value={String(formik?.values?.creditCardPenaltyAPR)}
                                                     onChange={formik.handleChange}
+                                                    isReadOnly={!editable}
                                                     endContent={
                                                         <div className="pointer-events-none flex items-center">
                                                             <span className="text-default-400 text-small">%</span>
@@ -300,6 +271,7 @@ const AddUpdateSettings = () => {
                                                 <Input className="col-span-1" name='loanLateFee' label="Loan late fee" variant="bordered"
                                                     type="number" value={String(formik?.values?.loanLateFee)}
                                                     onChange={formik.handleChange}
+                                                    isReadOnly={!editable}
                                                     startContent={
                                                         <div className="pointer-events-none flex items-center">
                                                             <span className="text-default-400 text-small">$</span>
@@ -312,6 +284,7 @@ const AddUpdateSettings = () => {
                                                 <Input className="col-span-1" name='loanAPR' label="Loan APR (%)" variant="bordered"
                                                     type="number" value={String(formik?.values?.loanAPR)}
                                                     onChange={formik.handleChange}
+                                                    isReadOnly={!editable}
                                                     endContent={
                                                         <div className="pointer-events-none flex items-center">
                                                             <span className="text-default-400 text-small">%</span>
@@ -324,6 +297,7 @@ const AddUpdateSettings = () => {
                                                 <Input className="col-span-1" name='loanPenaltyAPR' label="Loan Penalty APR (%)" variant="bordered"
                                                     type="number" value={String(formik?.values?.loanPenaltyAPR)}
                                                     onChange={formik.handleChange}
+                                                    isReadOnly={!editable}
                                                     endContent={
                                                         <div className="pointer-events-none flex items-center">
                                                             <span className="text-default-400 text-small">%</span>
@@ -333,12 +307,9 @@ const AddUpdateSettings = () => {
                                                     color={isFormFieldValid('loanPenaltyAPR') ? "danger" : "success"}
                                                     errorMessage={getFormErrorMessage('loanPenaltyAPR')}
                                                 />
-
-
-
                                             </div>
                                             {(formik?.values?.financeData?.length ?? 0) > 0 && (
-                                                <h4 className="px-6 py-4 text-2xl font-semibold">
+                                                <h4 className="py-4 text-2xl font-semibold">
                                                     Finance Data
                                                 </h4>
                                             )}
@@ -357,6 +328,7 @@ const AddUpdateSettings = () => {
                                                                                 </CardHeader>
                                                                                 <div className="w-full px-2 md:px-6 grid grid-cols-1 md:grid-cols-5 gap-4 py-3">
                                                                                     <Input className="col-span-1"
+                                                                                        isReadOnly={!editable}
                                                                                         name={`financeData[${i}].initialPayout`}
                                                                                         label="Initial Salary" variant="bordered"
                                                                                         type="number" value={String(formik?.values?.financeData && formik?.values?.financeData[i]?.initialPayout)}
@@ -372,6 +344,7 @@ const AddUpdateSettings = () => {
                                                                                     />
                                                                                     <Input className="col-span-1"
                                                                                         name={`financeData[${i}].secondPayout`}
+                                                                                        isReadOnly={!editable}
                                                                                         label="Mid-month Salary" variant="bordered"
                                                                                         type="number" value={String(formik?.values?.financeData && formik?.values?.financeData[i]?.secondPayout)}
                                                                                         onChange={formik.handleChange}
@@ -386,6 +359,7 @@ const AddUpdateSettings = () => {
                                                                                     />
                                                                                     <Input className="col-span-1"
                                                                                         name={`financeData[${i}].creditCardDue`}
+                                                                                        isReadOnly={!editable}
                                                                                         label="Credit Card Due" variant="bordered"
                                                                                         type="number" value={String(formik?.values?.financeData && formik?.values?.financeData[i]?.creditCardDue)}
                                                                                         onChange={formik.handleChange}
@@ -400,6 +374,7 @@ const AddUpdateSettings = () => {
                                                                                     />
                                                                                     <Input className="col-span-1"
                                                                                         name={`financeData[${i}].loanDue`}
+                                                                                        isReadOnly={!editable}
                                                                                         label="Loan Due" variant="bordered"
                                                                                         type="number" value={String(formik?.values?.financeData && formik?.values?.financeData[i]?.loanDue)}
                                                                                         onChange={formik.handleChange}
@@ -414,6 +389,7 @@ const AddUpdateSettings = () => {
                                                                                     />
                                                                                     <Input
                                                                                         className=""
+                                                                                        isReadOnly={!editable}
                                                                                         name={`financeData[${i}].creditCardMinDue`}
                                                                                         label="Credit Card min due" variant="bordered"
                                                                                         type="number"
@@ -437,7 +413,7 @@ const AddUpdateSettings = () => {
                                                         </div>)
                                                 }}
                                             </FieldArray>
-                                            <div className="w-full flex justify-end py-4 px-8">
+                                            <div className="w-full flex justify-end py-4">
                                                 <Button type="submit" color="primary" isLoading={isButtonLoading}> Submit</Button>
                                             </div>
 
@@ -448,11 +424,6 @@ const AddUpdateSettings = () => {
 
                         </Formik>
                     )}
-
-
-
-
-
                 </div>
 
             </div>

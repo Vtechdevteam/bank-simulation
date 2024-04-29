@@ -1,4 +1,4 @@
-import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, DropdownItem, DropdownTrigger, Dropdown, DropdownMenu, Avatar, Spinner, Button, Divider, Input } from "@nextui-org/react";
+import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, DropdownItem, DropdownTrigger, Dropdown, DropdownMenu, Avatar, Spinner, Button, Divider, Input, Select, SelectItem } from "@nextui-org/react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import store from "store"
@@ -127,7 +127,7 @@ const Page1 = () => {
                     <p className="font-bold text-inherit">Simulation Game</p>
                 </NavbarBrand>
             </Navbar>
-            <div className="w-full h-screen bg-white">
+            <div className="w-full h-screen bg-white max-w-5xl mx-auto">
                 <div className="mx-9 text-black">
                     {isPageLoading ? (
                         <div className="flex justify-center pt-8">
@@ -152,7 +152,7 @@ const Page1 = () => {
                                             <label className="col-span-1">Savings</label>
                                             <label className="col-span-1">{CacheService.getPreviousMonthTransaction(month)?.savings ?? 0}</label>
                                         </div>
-                                        <Divider className="my-1 w-2/3"/>
+                                        <Divider className="my-1 w-2/3" />
                                         <div className="grid grid-cols-2 ">
                                             <label className="col-span-1">Total available funds</label>
                                             <label className="col-span-1">{getTotalAvailableFunds()}</label>
@@ -176,7 +176,7 @@ const Page1 = () => {
                                             <label className="col-span-1">Loan interest</label>
                                             <label className="col-span-1">{CacheService.getPreviousMonthLoanInterest(month)}</label>
                                         </div>
-                                        <Divider className="my-1 w-2/3"/>
+                                        <Divider className="my-1 w-2/3" />
                                         <div className="grid grid-cols-2 ">
                                             <label className="col-span-1">Total balance</label>
                                             <label className="col-span-1">{
@@ -209,7 +209,7 @@ const Page1 = () => {
                                             </div>
                                             <label className="col-span-1 my-auto">{CacheService.getCurrentFinanceData(month)?.loanDue}</label>
                                         </div>
-                                        <Divider className="my-1 mt-2"/>
+                                        <Divider className="my-1 mt-2" />
                                         <div className="mt-3 grid grid-cols-5">
                                             <label className="col-span-4">Total debt balance</label>
                                             <label className="col-span-1">{
@@ -277,7 +277,7 @@ const Page1 = () => {
                                     <div className="grid grid-cols-4">
                                         <label className="col-span-1 font-semibold border-2 py-1 px-3 ">Total </label>
                                         <label className="col-span-1 text-start border-2 py-1 px-3">{
-                                            (getCurrentCreditCardDue() + getCurrentLoanDue())
+                                            Math.round(((getCurrentCreditCardDue() + getCurrentLoanDue())) * 100) / 100
                                         }</label>
                                         <label className="col-span-1 text-start border-2 py-1 px-3">{
                                             (Number(formik.values.creditCardAllocation ?? 0)) +
@@ -301,12 +301,48 @@ const Page1 = () => {
                             </form>
                         </>
                     )}
+                    {
+                        CacheService.masterData?.financeData?.length == (month - 1) && (
+                            <div className="mt-10">
+                                <label htmlFor="">Please answer the following questions to proceed:</label>
+                                <div className="mt-4">
+                                    <label htmlFor="">What is your gender?</label>
+                                    <Select
+                                        label="Gender"
+                                        placeholder="Select your gender"
+                                        className="max-w-xs block mt-2">
+                                        <SelectItem key={"Male"} value={"Male"}>
+                                            {"Male"}
+                                        </SelectItem>
+                                        <SelectItem key={"Female"} value={"Female"}>
+                                            {"Female"}
+                                        </SelectItem>
+                                        <SelectItem key={"Non-binary/third gender"} value={"Non-binary/third gender"}>
+                                            {"Non-binary/third gender"}
+                                        </SelectItem>
+                                        <SelectItem key={"Prefer not to say"} value={"Prefer not to say"}>
+                                            {"Prefer not to say"}
+                                        </SelectItem>
+                                    </Select>
+                                </div>
+                                <div className="mt-4">
+                                    <label htmlFor="">What is your age?</label>
+                                    <Input
+                                        label="Age"
+                                        placeholder="Enter your age"
+                                        type="number"
+                                        className="max-w-xs block mt-2">
+                                    </Input>
+                                </div>
+                                <Button onClick={() => {
+                                    Router.push("/thank-you")
+                                }} className="mt-4" color="primary">Submit</Button>
+                            </div>
+                        )
+                    }
                 </div>
-
             </div>
         </>
-
-
     )
 
 }

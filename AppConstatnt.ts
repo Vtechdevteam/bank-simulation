@@ -1,4 +1,4 @@
-let endpoint = "https://urmmarketplacebedev.azurewebsites.net"
+let endpoint = "https://budget-genius.azurewebsites.net"
 if (typeof window !== "undefined") {
     switch ((window as any).location.hostname) {
         case "ambitious-sea-091146800.4.azurestaticapps.net": {
@@ -6,19 +6,21 @@ if (typeof window !== "undefined") {
             break;
         }
         case "localhost": {
-            endpoint = "http://192.168.29.246:8080";
+            endpoint = "https://budget-genius.azurewebsites.net";
             break;
         }
         default: {
-            endpoint = "https://urmmarketplacebedev.azurewebsites.net";
+            endpoint = "https://budget-genius.azurewebsites.net";
         }
     }
 }
 export const BASE_ENDPOINT = endpoint
 
-export const GLOBAL_DATA = 'http://192.168.29.246:8080/master-data'
+export const GLOBAL_DATA = 'https://budget-genius.azurewebsites.net/master-data'
 export const ADD_GLOBAL_DATA = ''
 export const UPDATE_GLOBAL_DATA = ''
+export const ADMIN_AUTH_CODE = '199881'
+export const USER_AUTH_CODE = '108090'
 
 
 
