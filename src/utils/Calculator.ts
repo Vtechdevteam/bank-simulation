@@ -1,6 +1,7 @@
 const Calculator = {
     calculateInterest: (due: number, percentage: number, numberOfDays: number) => {
-        return Math.round(due*numberOfDays*(0.22/365) * 100)/100
+        const interest = due*numberOfDays*(percentage*0.01/365)
+        return Math.round(interest * 100)/100
     },
     calculateMonth(play: number): number{
         if(play%2 == 0){

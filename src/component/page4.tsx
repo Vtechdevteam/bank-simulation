@@ -1,27 +1,21 @@
-import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, getKeyValue} from "@nextui-org/react";
+import CacheService from "@/services/CacheService";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, getKeyValue, Spinner } from "@nextui-org/react";
+import { useEffect, useState } from "react";
 
 
 const Page4 = ({ setPage = async (page: number) => { } }: { setPage: any }) => {
-    const rows = [
-        {
-            key: "1",
-            name: "Late fee",
-            card: "$25",
-            loan: "$29",
-        },
-        {
-            key: "2",
-            name: "APR",
-            card: "22%",
-            loan: "26%",
-        },
-        {
-            key: "1",
-            name: "Penalty APR (when payment missed)",
-            card: "27%",
-            loan: "31%",
-        },
-    ];
+
+    const [isDataLoading, setIsDataLoading] = useState<boolean>(false)
+
+    useEffect(() => {
+        init()
+    }, [])
+
+    const init = async () => {
+        setIsDataLoading(true)
+        await CacheService.fetch()
+        setIsDataLoading(false)
+    }
 
     const columns = [
         {
@@ -88,18 +82,34 @@ const Page4 = ({ setPage = async (page: number) => { } }: { setPage: any }) => {
                 </li>
             </ul>
 
-            <Table aria-label="Example table with dynamic content">
-                <TableHeader columns={columns}>
-                    {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
-                </TableHeader>
-                <TableBody items={rows}>
-                    {(item) => (
-                        <TableRow key={item.key}>
-                            {(columnKey) => <TableCell>{getKeyValue(item, columnKey)}</TableCell>}
-                        </TableRow>
-                    )}
-                </TableBody>
-            </Table>
+            {
+                isDataLoading ? (
+                    <Spinner />
+                ) : (
+                    <Table aria-label="Example table with dynamic content">
+                        <TableHeader columns={columns}>
+                            {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
+                        </TableHeader>
+                        <TableBody>
+                            <TableRow key={"1"}>
+                                <TableCell>{"Late fee"}</TableCell>
+                                <TableCell>{CacheService.masterData?.creditCardLateFee}</TableCell>
+                                <TableCell>{CacheService.masterData?.loanLateFee}</TableCell>
+                            </TableRow>
+                            <TableRow key={"2"}>
+                                <TableCell>{"APR"}</TableCell>
+                                <TableCell>{CacheService.masterData?.creditCardAPR}%</TableCell>
+                                <TableCell>{CacheService.masterData?.loanAPR}%</TableCell>
+                            </TableRow>
+                            <TableRow key={"3"}>
+                                <TableCell>{"Penalty APR"}</TableCell>
+                                <TableCell>{CacheService.masterData?.creditCardPenaltyAPR}%</TableCell>
+                                <TableCell>{CacheService.masterData?.loanPenaltyAPR}%</TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                )
+            }
 
 
 

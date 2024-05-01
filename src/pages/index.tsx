@@ -9,6 +9,7 @@ import Page2 from "@/component/page2";
 import Page3 from "@/component/page3";
 import Page4 from "@/component/page4";
 import Page5 from "@/component/page5";
+import CacheService from "@/services/CacheService";
 
 
 
@@ -36,12 +37,6 @@ export interface FinanceDaum {
 const Settings = () => {
 
   const [page, setPage] = useState<number>(1)
-  useEffect(() => {
-    init()
-  }, [])
-  const init = async () => {
-
-  }
 
   return (
     <>
@@ -61,17 +56,17 @@ const Settings = () => {
       <div className="w-full h-screen bg-white">
         <div className="w-full flex justify-center mx-9 px-8 py-5 text-black">
           <div className="w-2/3 rounded-md shadow-lg px-6 py-4 my-8">
-          <h1 className="text-2xl font-semibold py-4">Budget Genius — The Economic Allocation Simulation</h1>
+            <h1 className="text-2xl font-semibold py-4">Budget Genius — The Economic Allocation Simulation</h1>
             {page === 1 && (
               <Page1 setPage={(page: number) => { setPage(page) }} />
             )}
-             {page === 2 && (
+            {page === 2 && (
               <Page2 setPage={(page: number) => { setPage(page) }} />
             )}
-             {page === 3 && (
+            {page === 3 && (
               <Page3 setPage={(page: number) => { setPage(page) }} />
             )}
-             {page === 4 && (
+            {page === 4 && (
               <Page4 setPage={(page: number) => { setPage(page) }} />
             )}
             {page === 5 && (

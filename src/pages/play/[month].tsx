@@ -19,6 +19,10 @@ const Page1 = () => {
     useEffect(() => {
         if (router.isReady) {
             init()
+            window.onpopstate = () => {
+                alert("Going back will discard all the changes. Please re-login.")
+                window.location.reload()
+            };
         }
     }, [router.isReady, router.query.month])
 
@@ -43,15 +47,15 @@ const Page1 = () => {
     })
 
     const checkForSavingErrors = () => {
-        if(getSavings() < 0 ){
+        if (getSavings() < 0) {
             setSavingsError("Saving cannot be negative. You have allocated funds over and above your total available funds. Please adjust the allocations.")
-        }else{
+        } else {
             setSavingsError("")
         }
     }
 
     const submit = (values: any) => {
-        if(getSavings() < 0){
+        if (getSavings() < 0) {
             checkForSavingErrors()
             return;
         }
@@ -87,7 +91,8 @@ const Page1 = () => {
         return Math.round((
             (CacheService.getCurrentFinanceData(month)?.creditCardDue ?? 0) +
             (CacheService.getPreviousMonthTransaction(month)?.creditCardDue ?? 0) +
-            (CacheService.getPreviousMonthCreditCardInterest(month))
+            (CacheService.getPreviousMonthCreditCardInterest(month)) +
+            (CacheService.getPreviousMonthCreditCardLateFee(month))
         ) * 100) / 100
     }
 
@@ -105,7 +110,7 @@ const Page1 = () => {
     }
 
     function getSavings(): number {
-        const savings =  Math.round((((CacheService.getCurrentFinanceData(month)?.initialPayout ?? 0) + (CacheService.getPreviousMonthTransaction(month)?.savings ?? 0)) -
+        const savings = Math.round((((CacheService.getCurrentFinanceData(month)?.initialPayout ?? 0) + (CacheService.getPreviousMonthTransaction(month)?.savings ?? 0)) -
             (Number(formik.values.creditCardAllocation ?? 0) +
                 Number(formik.values.loanAllocation ?? 0))) * 100) / 100
         return savings
@@ -149,8 +154,26 @@ const Page1 = () => {
                         <>
                             <div className="py-4">
                                 <h2 className="font-semibold text-xl">{month % 2 == 0 ? 'Mid' : 'Begining'} of Month {Calculator.calculateMonth(month)}</h2>
-                                <p className="">Here is an overview of your current financial situation. Allocate your available funds across the three accounts. Your credit card and personal loan payments are due today.
-                                </p>
+                                <p className="">Here is an overview of your current financial situation. Allocate your available funds across the three accounts. Your credit card and personal loan payments are due today.</p>
+                                {(!CacheService.isGraceEnabled && (month % 2 == 0)) && (
+                                    <>
+                                        <br />
+                                        <p className="text-danger">You missed making your payment. Your credit card company sends you a note
+                                            saying that they will apply a {CacheService.masterData?.creditCardLateFee} late fee and {CacheService.getPreviousMonthCreditCardInterest(month, false)} in penalty interest charges on your unpaid
+                                            balance.</p>
+                                    </>
+                                )}
+                                {
+                                    (CacheService.isGraceEnabled && (month % 2 == 0)) && (
+                                        <>
+                                            <br />
+                                            <p className="text-danger">You missed making your payment. Your credit card company sends you a note
+                                                saying that they will apply a {CacheService.masterData?.creditCardLateFee} late fee and {CacheService.getPreviousMonthCreditCardInterest(month, false)} in penalty interest charges on your unpaid
+                                                balance. However, they are offering you an additional grace period. If you pay within this
+                                                period, you will not incur any penalty interest charges and will not have to pay the late fee.</p>
+                                        </>
+                                    )
+                                }
                             </div>
                             <div className="w-full flex">
                                 <div className="w-1/2">
@@ -179,6 +202,10 @@ const Page1 = () => {
                                         <div className="grid grid-cols-2">
                                             <label className="col-span-1">Credit card interest</label>
                                             <label className="col-span-1">{CacheService.getPreviousMonthCreditCardInterest(month)}</label>
+                                        </div>
+                                        <div className="grid grid-cols-2">
+                                            <label className="col-span-1">Credit card late fee</label>
+                                            <label className="col-span-1">{CacheService.getPreviousMonthCreditCardLateFee(month)}</label>
                                         </div>
                                         <div className="grid grid-cols-2 ">
                                             <label className="col-span-1">Loan balance</label>

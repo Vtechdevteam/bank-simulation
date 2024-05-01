@@ -8,48 +8,15 @@ class Service{
 
     userTransactions?: UserTransaction[] = []
 
-    // constructor(){
-    //     // this.masterData = {
-    //     //     "numberOfMonths": 3,
-    //     //     "creditCardLateFee": 10,
-    //     //     "creditCardAPR": 10,
-    //     //     "creditCardPenaltyAPR": 10,
-    //     //     "loanLateFee": 10,
-    //     //     "loanAPR": 10,
-    //     //     "loanPenaltyAPR": 10,
-    //     //     "financeData": [
-    //     //         {
-    //     //             "sequenceNumber": 1,
-    //     //             "initialPayout": 1500,
-    //     //             "creditCardDue": 600,
-    //     //             "loanDue": 600,
-    //     //             "creditCardMinDue": 10
-    //     //         },
-    //     //         {
-    //     //             "sequenceNumber": 2,
-    //     //             "initialPayout": 1000,
-    //     //             "creditCardDue": 0,
-    //     //             "loanDue": 0,
-    //     //             "creditCardMinDue": 0
-    //     //         },
-    //     //         {
-    //     //             "sequenceNumber": 3,
-    //     //             "initialPayout": 2500,
-    //     //             "creditCardDue": 1000,
-    //     //             "loanDue": 600,
-    //     //             "creditCardMinDue": 10
-    //     //         },
-    //     //         {
-    //     //             "sequenceNumber": 4,
-    //     //             "initialPayout": 2000,
-    //     //             "creditCardDue": 0,
-    //     //             "loanDue": 0,
-    //     //             "creditCardMinDue": 0
-    //     //         },
-    //     //     ]
-    //     // }
-    //     this.fetch()
-    // }
+    isGraceEnabled = Math.round(Math.random()) == 0 ? false : true
+
+    constructor(){
+        if(this.isGraceEnabled){
+            console.log("You are a grace candidate.")
+        }else{
+            console.log("You are non-grace candidate.")
+        }
+    }
 
     async fetch(){
         const md = await GlobalDataService.getGlobalDataData();
@@ -81,20 +48,35 @@ class Service{
         )
     }
 
-    getPreviousMonthCreditCardInterest(month: number): number {
+    getPreviousMonthCreditCardInterest(month: number, forCalculation: boolean = true): number {
         const pmt = this.getPreviousMonthTransaction(month)
-        const pmfd = this.getCurrentFinanceData(month)
+        const pmfd = this.getPreviousFinanceData(month)
+
+        let interest = this.masterData?.creditCardAPR
+        if((month % 2 == 0) && this.isGraceEnabled && forCalculation){
+            interest = 0
+        }
+
         if((pmt?.creditCardAllocation ?? 0) < (pmfd?.creditCardMinDue ?? 0))
             return Calculator.calculateInterest(
                 this.getPreviousMonthTransaction(month)?.creditCardDue ?? 0,
-                this.masterData?.creditCardPenaltyAPR ?? 0,
+                interest ?? 0,
                 15
             )
         return Calculator.calculateInterest(
             this.getPreviousMonthTransaction(month)?.creditCardDue ?? 0,
-            this.masterData?.creditCardAPR ?? 0,
+            interest ?? 0,
             15
         )
+    }
+
+    getPreviousMonthCreditCardLateFee(month: number, forCalculation: boolean = true): number {
+        const pmt = this.getPreviousMonthTransaction(month)
+        const pmfd = this.getPreviousFinanceData(month)
+
+        if((pmt?.creditCardAllocation ?? 0) < (pmfd?.creditCardMinDue ?? 0))
+            return this.masterData?.creditCardLateFee ?? 0
+        return 0
     }
 
     setCurrentMonthTransaction(data: UserTransaction){
@@ -106,7 +88,8 @@ class Service{
         return Math.round(((this.getPreviousMonthTransaction(month)?.creditCardDue ?? 0) + 
         (CacheService.getPreviousMonthTransaction(month)?.loanDue ?? 0) +
         this.getPreviousMonthLoanInterest(month) + 
-        this.getPreviousMonthCreditCardInterest(month))*100)/100
+        this.getPreviousMonthCreditCardInterest(month)+
+        this.getPreviousMonthCreditCardLateFee(month))*100)/100
     }
 
     getCurrentMonthCreditCardAndLoanBalanceDue(month: number) {
