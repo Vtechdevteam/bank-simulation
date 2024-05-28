@@ -155,7 +155,7 @@ const Page1 = () => {
                             <div className="py-4">
                                 <h2 className="font-semibold text-xl">{month % 2 == 0 ? 'Mid' : 'Begining'} of Month {Calculator.calculateMonth(month)}</h2>
                                 <p className="">Here is an overview of your current financial situation. Allocate your available funds across the three accounts. Your credit card and personal loan payments are due today.</p>
-                                {(!CacheService.isGraceEnabled && (month % 2 == 0)) && (
+                                {(!CacheService.isGraceEnabled && (month == 6)) && (
                                     <>
                                         <br />
                                         <p className="text-danger">You missed making your payment. Your credit card company sends you a note
@@ -164,7 +164,7 @@ const Page1 = () => {
                                     </>
                                 )}
                                 {
-                                    (CacheService.isGraceEnabled && (month % 2 == 0)) && (
+                                    (CacheService.isGraceEnabled && (month == 6)) && (
                                         <>
                                             <br />
                                             <p className="text-danger">You missed making your payment. Your credit card company sends you a note
@@ -348,37 +348,7 @@ const Page1 = () => {
                     )}
                     {
                         CacheService.masterData?.financeData?.length == (month - 1) && (
-                            <div className="mt-10">
-                                <label htmlFor="">Please answer the following questions to proceed:</label>
-                                <div className="mt-4">
-                                    <label htmlFor="">What is your gender?</label>
-                                    <Select
-                                        label="Gender"
-                                        placeholder="Select your gender"
-                                        className="max-w-xs block mt-2">
-                                        <SelectItem key={"Male"} value={"Male"}>
-                                            {"Male"}
-                                        </SelectItem>
-                                        <SelectItem key={"Female"} value={"Female"}>
-                                            {"Female"}
-                                        </SelectItem>
-                                        <SelectItem key={"Non-binary/third gender"} value={"Non-binary/third gender"}>
-                                            {"Non-binary/third gender"}
-                                        </SelectItem>
-                                        <SelectItem key={"Prefer not to say"} value={"Prefer not to say"}>
-                                            {"Prefer not to say"}
-                                        </SelectItem>
-                                    </Select>
-                                </div>
-                                <div className="mt-4">
-                                    <label htmlFor="">What is your age?</label>
-                                    <Input
-                                        label="Age"
-                                        placeholder="Enter your age"
-                                        type="number"
-                                        className="max-w-xs block mt-2">
-                                    </Input>
-                                </div>
+                            <div className="mt-2">
                                 <Button onClick={() => {
                                     Router.push("/thank-you")
                                 }} className="mt-4" color="primary">Submit</Button>
