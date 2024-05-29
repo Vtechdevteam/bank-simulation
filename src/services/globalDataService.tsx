@@ -1,5 +1,5 @@
 import NetworkService from "./NetworkService"
-import { ADD_GLOBAL_DATA, BASE_ENDPOINT, GLOBAL_DATA } from "../../AppConstatnt"
+import { ADD_GLOBAL_DATA, BASE_ENDPOINT, GLOBAL_DATA, SUBMIT_RESPONSE } from "../../AppConstatnt"
 
 export const GlobalDataService={
     
@@ -18,10 +18,19 @@ export const GlobalDataService={
         })
         return (response?.data)
     },
-   
-    
-
-    
-
-    
+    async submitResponse (body: any){
+        const response = await new NetworkService().makeRequest({
+            baseURL: `${SUBMIT_RESPONSE}`,
+            method: 'post',
+            data:body
+        })
+        return (response?.data)
+    },
+    async downloadReport (){
+        const response = await new NetworkService().makeRequest({
+            baseURL: `${SUBMIT_RESPONSE}`,
+            method: 'get'
+        })
+        return (response?.data)
+    },
 }

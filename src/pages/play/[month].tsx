@@ -33,6 +33,16 @@ const Page1 = () => {
         formik.resetForm()
     }
 
+    const submitResponse = async () => {
+        const data = {
+            masterData: CacheService.masterData,
+            userTransactions: CacheService.userTransactions,
+            grace: CacheService.isGraceEnabled
+        }
+        await GlobalDataService.submitResponse(data);
+        Router.push("/thank-you")
+    }
+
     const formik = useFormik({
         enableReinitialize: true,
         initialValues: CacheService.getCurrentMonthTransaction(month) ?? {},
@@ -341,7 +351,7 @@ const Page1 = () => {
                                     </div>
                                 </div>
                                 <div className="w-full pb-4 flex justify-end">
-                                    <Button type={"submit"} color="primary" >Go to Next</Button>
+                                    <Button type={"submit"} color="primary">Go to Next</Button>
                                 </div>
                             </form>
                         </>
@@ -349,8 +359,8 @@ const Page1 = () => {
                     {
                         CacheService.masterData?.financeData?.length == (month - 1) && (
                             <div className="mt-2">
-                                <Button onClick={() => {
-                                    Router.push("/thank-you")
+                                <Button onClick={async () => {
+                                    await submitResponse()
                                 }} className="mt-4" color="primary">Submit</Button>
                             </div>
                         )

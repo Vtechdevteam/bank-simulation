@@ -7,6 +7,7 @@ import { GlobalDataService } from "@/services/globalDataService";
 import Router from "next/router";
 import { FinanceDatum, MasterInformation } from "@/models/Transaction";
 import StorageService from "@/services/StorageService";
+import { SUBMIT_RESPONSE } from "../../../AppConstatnt";
 
 
 const AddUpdateSettings = () => {
@@ -159,6 +160,11 @@ const AddUpdateSettings = () => {
                             Admin Settings
                         </h2>
                     </div>
+                    <Button
+                                    color="primary"
+                                    onClick={() => { window.open(SUBMIT_RESPONSE) }}>
+                                    Download Report
+                                </Button>
                     {
                         !editable && (
                             <div className="mx-8">

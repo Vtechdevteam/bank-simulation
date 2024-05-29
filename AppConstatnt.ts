@@ -6,7 +6,7 @@ if (typeof window !== "undefined") {
             break;
         }
         case "localhost": {
-            endpoint = "https://budget-genius.azurewebsites.net";
+            endpoint = "http://localhost:8080";
             break;
         }
         default: {
@@ -16,9 +16,10 @@ if (typeof window !== "undefined") {
 }
 export const BASE_ENDPOINT = endpoint
 
-export const GLOBAL_DATA = 'https://budget-genius.azurewebsites.net/master-data'
+export const GLOBAL_DATA = `${BASE_ENDPOINT}/master-data`
 export const ADD_GLOBAL_DATA = ''
 export const UPDATE_GLOBAL_DATA = ''
+export const SUBMIT_RESPONSE = `${BASE_ENDPOINT}/submit-response`
 export const ADMIN_AUTH_CODE = '199881'
 export const USER_AUTH_CODE = '108090'
 
