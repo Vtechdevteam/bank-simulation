@@ -56,6 +56,7 @@ class Service{
         let penaltyApr = this.masterData?.creditCardPenaltyAPR
         if((month == 6) && this.isGraceEnabled && forCalculation){
             interest = 0
+            return 0;
         }
 
         if((pmt?.creditCardAllocation ?? 0) < (pmfd?.creditCardMinDue ?? 0))
@@ -74,6 +75,10 @@ class Service{
     getPreviousMonthCreditCardLateFee(month: number, forCalculation: boolean = true): number {
         const pmt = this.getPreviousMonthTransaction(month)
         const pmfd = this.getPreviousFinanceData(month)
+
+        if((month == 6) && this.isGraceEnabled && forCalculation){
+            return 0;
+        }
 
         if((pmt?.creditCardAllocation ?? 0) < (pmfd?.creditCardMinDue ?? 0))
             return this.masterData?.creditCardLateFee ?? 0
