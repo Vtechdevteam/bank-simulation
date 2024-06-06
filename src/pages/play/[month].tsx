@@ -37,7 +37,8 @@ const Page1 = () => {
         const data = {
             masterData: CacheService.masterData,
             userTransactions: CacheService.userTransactions,
-            grace: CacheService.isGraceEnabled
+            grace: CacheService.isGraceEnabled,
+            ip: await GlobalDataService.getIp()
         }
         await GlobalDataService.submitResponse(data);
         Router.push("/thank-you")

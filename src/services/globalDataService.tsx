@@ -33,4 +33,11 @@ export const GlobalDataService={
         })
         return (response?.data)
     },
+    async getIp(){
+        const response = await new NetworkService().makeRequest({
+            baseURL: `https://api.ipify.org`,
+            method: 'get'
+        })
+        return (response)
+    }
 }

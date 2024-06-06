@@ -53,6 +53,7 @@ class Service{
         const pmfd = this.getPreviousFinanceData(month)
 
         let interest = this.masterData?.creditCardAPR
+        let penaltyApr = this.masterData?.creditCardPenaltyAPR
         if((month == 6) && this.isGraceEnabled && forCalculation){
             interest = 0
         }
@@ -60,7 +61,7 @@ class Service{
         if((pmt?.creditCardAllocation ?? 0) < (pmfd?.creditCardMinDue ?? 0))
             return Calculator.calculateInterest(
                 this.getPreviousMonthTransaction(month)?.creditCardDue ?? 0,
-                interest ?? 0,
+                penaltyApr ?? 0,
                 15
             )
         return Calculator.calculateInterest(
