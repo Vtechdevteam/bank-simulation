@@ -136,7 +136,8 @@ const Page1 = () => {
         return Math.round((
             (CacheService.getPreviousMonthTransaction(month)?.loanDue ?? 0) +
             (CacheService.getCurrentFinanceData(month)?.loanDue ?? 0) +
-            (CacheService.getPreviousMonthLoanInterest(month))
+            (CacheService.getPreviousMonthLoanInterest(month) +
+            (CacheService.getPreviousMonthLoanLateFee(month)))
         ) * 100) / 100
     }
 
@@ -166,7 +167,7 @@ const Page1 = () => {
                             <div className="py-4">
                                 <h2 className="font-semibold text-xl">{month % 2 == 0 ? 'Mid' : 'Begining'} of Month {Calculator.calculateMonth(month)}</h2>
                                 <p className="">Here is an overview of your current financial situation. Allocate your available funds across the three accounts. Your credit card and personal loan payments are due today.</p>
-                                {(!CacheService.isGraceEnabled && (month == 6)) && (
+                                {(!CacheService.isGraceEnabled && (month == 6) && ((CacheService.getPreviousMonthTransaction(month)?.creditCardAllocation ?? 0) < (CacheService.getPreviousFinanceData(month)?.creditCardMinDue ?? 0))) && (
                                     <>
                                         <br />
                                         <p className="text-danger">You missed making your payment. Your credit card company sends you a note
@@ -226,6 +227,10 @@ const Page1 = () => {
                                             <label className="col-span-1">Loan interest</label>
                                             <label className="col-span-1">{CacheService.getPreviousMonthLoanInterest(month)}</label>
                                         </div>
+                                        <div className="grid grid-cols-2">
+                                            <label className="col-span-1">Loan late fee</label>
+                                            <label className="col-span-1">{CacheService.getPreviousMonthLoanLateFee(month)}</label>
+                                        </div>
                                         <Divider className="my-1 w-2/3" />
                                         <div className="grid grid-cols-2 ">
                                             <label className="col-span-1">Total balance</label>
@@ -252,6 +257,7 @@ const Page1 = () => {
                                         <div className="mt-3 grid grid-cols-5">
                                             <div className="col-span-4">
                                                 <label className="">Personal loan monthly balance</label>
+                                                <label className="block ml-3"> - minimum payment due: {CacheService.getCurrentFinanceData(month)?.loanMinDue}</label>
                                                 <label className="block ml-3"> - APR: {CacheService.masterData?.loanAPR}% (applied if not paid in full this time)
                                                 </label>
                                                 <label className="block ml-3"> - Penalty APR: {CacheService.masterData?.loanPenaltyAPR}% (applied if not paid on time)
@@ -263,7 +269,7 @@ const Page1 = () => {
                                         <div className="mt-3 grid grid-cols-5">
                                             <label className="col-span-4">Total debt balance</label>
                                             <label className="col-span-1">{
-                                                (getCurrentCreditCardDue() + getCurrentLoanDue())
+                                                Math.round((getCurrentCreditCardDue() + getCurrentLoanDue()) *100)/100
                                             }</label>
                                         </div>
                                     </div>
@@ -299,6 +305,7 @@ const Page1 = () => {
                                                 isInvalid={isFormFieldValid('creditCardAllocation')}
                                                 color={isFormFieldValid('creditCardAllocation') ? "danger" : "success"}
                                                 errorMessage={getFormErrorMessage('creditCardAllocation')}
+                                                inputMode="numeric"
                                                 value={String(formik.values.creditCardAllocation)}
                                             // isRequired={true}
                                             />
@@ -316,12 +323,13 @@ const Page1 = () => {
                                             <Input type="number" placeholder="Enter amount" size="sm" variant={"underlined"}
                                                 name="loanAllocation"
                                                 onChange={(e) => {
-                                                    formik.setFieldValue('loanAllocation', +e.target.value)
+                                                    formik.setFieldValue('loanAllocation', e.target.value)
                                                     checkForSavingErrors()
                                                 }}
                                                 isInvalid={isFormFieldValid('loanAllocation')}
                                                 color={isFormFieldValid('loanAllocation') ? "danger" : "success"}
                                                 errorMessage={getFormErrorMessage('loanAllocation')}
+                                                inputMode="numeric"
                                                 value={String(formik.values.loanAllocation)}
                                             // isRequired={true}
                                             />

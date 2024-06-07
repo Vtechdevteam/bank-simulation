@@ -66,6 +66,7 @@ const AddUpdateSettings = () => {
                     creditCardDue: fd?.creditCardDue ?? 0,
                     loanDue: fd?.loanDue ?? 0,
                     creditCardMinDue: fd?.creditCardMinDue ?? 0,
+                    loanMinDue: fd?.loanMinDue ?? 0,
                     secondPayout: data?.financeData?.find(d => d?.sequenceNumber == sequenceNumber + 1)?.initialPayout
                 }
                 financeData.push(element)
@@ -108,14 +109,16 @@ const AddUpdateSettings = () => {
                     creditCardDue: fd?.creditCardDue ?? 0,
                     loanDue: fd?.loanDue ?? 0,
                     creditCardMinDue: fd?.creditCardMinDue ?? 0,
+                    loanMinDue: fd?.loanMinDue ?? 0,
                 }
 
                 const secondElement: FinanceDatum = {
                     sequenceNumber: secondSequence,
-                    initialPayout: fd?.initialPayout ?? 0,
+                    initialPayout: fd?.secondPayout ?? 0,
                     creditCardDue: 0,
                     loanDue: 0,
                     creditCardMinDue: 0,
+                    loanMinDue: 0
                 }
                 formatedFinanceData.push(firstElement, secondElement)
             }
@@ -217,7 +220,8 @@ const AddUpdateSettings = () => {
                                                                 secondPayout: undefined,
                                                                 loanDue: undefined,
                                                                 creditCardDue: undefined,
-                                                                creditCardMinDue: undefined
+                                                                creditCardMinDue: undefined,
+                                                                loanMinDue: undefined
                                                             }
                                                             dataArr.push(obj)
                                                         }
@@ -404,9 +408,25 @@ const AddUpdateSettings = () => {
                                                                                                 <span className="text-default-400 text-small">$</span>
                                                                                             </div>
                                                                                         }
-                                                                                        isInvalid={isFormFieldValid('creditCardMinDuePercentage')}
-                                                                                        color={isFormFieldValid('creditCardMinDuePercentage') ? "danger" : "success"}
-                                                                                        errorMessage={getFormErrorMessage('creditCardMinDuePercentage')}
+                                                                                        isInvalid={isFormFieldValid('creditCardMinDue')}
+                                                                                        color={isFormFieldValid('creditCardMinDue') ? "danger" : "success"}
+                                                                                        errorMessage={getFormErrorMessage('creditCardMinDue')}
+                                                                                    />
+                                                                                    <Input
+                                                                                        className=""
+                                                                                        name={`financeData[${i}].loanMinDue`}
+                                                                                        label="Loan min due" variant="bordered"
+                                                                                        type="number"
+                                                                                        value={String(formik?.values?.financeData && formik?.values?.financeData[i]?.loanMinDue)}
+                                                                                        onChange={formik.handleChange}
+                                                                                        endContent={
+                                                                                            <div className="pointer-events-none flex items-center">
+                                                                                                <span className="text-default-400 text-small">$</span>
+                                                                                            </div>
+                                                                                        }
+                                                                                        isInvalid={isFormFieldValid('loanMinDue')}
+                                                                                        color={isFormFieldValid('loanMinDue') ? "danger" : "success"}
+                                                                                        errorMessage={getFormErrorMessage('loanMinDue')}
                                                                                     />
                                                                                 </div>
                                                                             </CardBody>

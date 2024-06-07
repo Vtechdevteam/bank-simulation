@@ -39,7 +39,7 @@ const AddUpdateSettings = () => {
         loanAPR: Yup.number()
             .required("This field is required!"),
         loanPenaltyAPR: Yup.number()
-            .required("This field is required!"),
+            .required("This field is required!")
     })
     useEffect(() => {
         init()
@@ -366,6 +366,22 @@ const AddUpdateSettings = () => {
                                                                                         isInvalid={isFormFieldValid('creditCardMinDuePercentage')}
                                                                                         color={isFormFieldValid('creditCardMinDuePercentage') ? "danger" : "success"}
                                                                                         errorMessage={getFormErrorMessage('creditCardMinDuePercentage')}
+                                                                                    />
+                                                                                    <Input
+                                                                                        className=""
+                                                                                        name={`financeData[${i}].loanMinDue`}
+                                                                                        label="Loan min due" variant="bordered"
+                                                                                        type="number"
+                                                                                        value={String(formik?.values?.financeData && formik?.values?.financeData[i]?.loanMinDue)}
+                                                                                        onChange={formik.handleChange}
+                                                                                        endContent={
+                                                                                            <div className="pointer-events-none flex items-center">
+                                                                                                <span className="text-default-400 text-small">$</span>
+                                                                                            </div>
+                                                                                        }
+                                                                                        isInvalid={isFormFieldValid('loanMinDue')}
+                                                                                        color={isFormFieldValid('loanMinDue') ? "danger" : "success"}
+                                                                                        errorMessage={getFormErrorMessage('loanMinDue')}
                                                                                     />
                                                                                 </div>
                                                                             </CardBody>

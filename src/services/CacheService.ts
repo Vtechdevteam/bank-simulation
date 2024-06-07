@@ -40,10 +40,26 @@ class Service{
         return this.userTransactions?.find(e => e.sequenceNumber == (month - 1))
     }
 
-    getPreviousMonthLoanInterest(month: number): number {
+    getPreviousMonthLoanInterest(month: number, forCalculation: boolean = true): number {
+        const pmt = this.getPreviousMonthTransaction(month)
+        const pmfd = this.getPreviousFinanceData(month)
+
+        let interest = this.masterData?.loanAPR
+        let penaltyApr = this.masterData?.loanPenaltyAPR
+        if((month == 6) && this.isGraceEnabled && forCalculation){
+            interest = 0
+            return 0;
+        }
+
+        if((pmt?.loanAllocation ?? 0) < (pmfd?.loanMinDue ?? 0))
+            return Calculator.calculateInterest(
+                this.getPreviousMonthTransaction(month)?.loanDue ?? 0,
+                penaltyApr ?? 0,
+                15
+            )
         return Calculator.calculateInterest(
             this.getPreviousMonthTransaction(month)?.loanDue ?? 0,
-            this.masterData?.loanAPR ?? 0,
+            interest ?? 0,
             15
         )
     }
@@ -82,6 +98,19 @@ class Service{
 
         if((pmt?.creditCardAllocation ?? 0) < (pmfd?.creditCardMinDue ?? 0))
             return this.masterData?.creditCardLateFee ?? 0
+        return 0
+    }
+
+    getPreviousMonthLoanLateFee(month: number, forCalculation: boolean = true): number {
+        const pmt = this.getPreviousMonthTransaction(month)
+        const pmfd = this.getPreviousFinanceData(month)
+
+        if((month == 6) && this.isGraceEnabled && forCalculation){
+            return 0;
+        }
+
+        if((pmt?.loanAllocation ?? 0) < (pmfd?.loanMinDue ?? 0))
+            return this.masterData?.loanLateFee ?? 0
         return 0
     }
 

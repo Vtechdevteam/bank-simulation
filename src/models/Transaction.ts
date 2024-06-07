@@ -23,6 +23,7 @@ export interface FinanceDatum {
     creditCardDue?:  number;
     loanDue?:        number;
     creditCardMinDue?: number;
+    loanMinDue?: number;
     secondPayout? :number
 }
 
