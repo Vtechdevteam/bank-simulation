@@ -67,7 +67,7 @@ const AddUpdateSettings = () => {
                     loanDue: fd?.loanDue ?? 0,
                     creditCardMinDue: fd?.creditCardMinDue ?? 0,
                     loanMinDue: fd?.loanMinDue ?? 0,
-                    secondPayout: data?.financeData?.find(d => d?.sequenceNumber == sequenceNumber + 1)?.initialPayout
+                    secondPayout: data?.financeData?.find(d => d?.sequenceNumber == ((fd.sequenceNumber ?? 0) + 1))?.initialPayout
                 }
                 financeData.push(element)
             }
@@ -99,7 +99,6 @@ const AddUpdateSettings = () => {
         setIsButtonLoading(true)
         try {
             const formatedFinanceData: FinanceDatum[] = []
-
             for (var fd of values.financeData ?? []) {
                 const firstSequence = (fd.sequenceNumber ?? 0) + ((fd.sequenceNumber ?? 0) - 1)
                 const secondSequence = firstSequence + 1
