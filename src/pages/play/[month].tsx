@@ -40,8 +40,14 @@ const Page1 = () => {
             grace: CacheService.isGraceEnabled,
             ip: await GlobalDataService.getIp()
         }
-        await GlobalDataService.submitResponse(data);
-        Router.push("/thank-you")
+        const res = await GlobalDataService.submitResponse(data);
+        console.log(res)
+        Router.push({
+            pathname: "/thank-you",
+            query: {
+                cc: res[0]?.responseId
+            }
+        })
     }
 
     const formik = useFormik({
@@ -176,7 +182,7 @@ const Page1 = () => {
                                     </>
                                 )}
                                 {
-                                    (CacheService.isGraceEnabled && (month == 6)) && (
+                                    ((CacheService.isGraceEnabled && (month == 6)) && ((CacheService.getPreviousMonthTransaction(month)?.creditCardAllocation ?? 0) < (CacheService.getPreviousFinanceData(month)?.creditCardMinDue ?? 0))) && (
                                         <>
                                             <br />
                                             <p className="text-danger">You missed making your payment. Your credit card company sends you a note

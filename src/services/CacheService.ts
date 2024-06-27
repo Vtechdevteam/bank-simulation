@@ -46,10 +46,11 @@ class Service{
 
         let interest = this.masterData?.loanAPR
         let penaltyApr = this.masterData?.loanPenaltyAPR
-        if((month == 6) && this.isGraceEnabled && forCalculation){
-            interest = 0
-            return 0;
-        }
+        // No grace period on loan
+        // if((month == 6) && this.isGraceEnabled && forCalculation){
+        //     interest = 0
+        //     return 0;
+        // }
 
         if((pmt?.loanAllocation ?? 0) < (pmfd?.loanMinDue ?? 0))
             return Calculator.calculateInterest(
@@ -105,9 +106,10 @@ class Service{
         const pmt = this.getPreviousMonthTransaction(month)
         const pmfd = this.getPreviousFinanceData(month)
 
-        if((month == 6) && this.isGraceEnabled && forCalculation){
-            return 0;
-        }
+        // No grace on loan
+        // if((month == 6) && this.isGraceEnabled && forCalculation){
+        //     return 0;
+        // }
 
         if((pmt?.loanAllocation ?? 0) < (pmfd?.loanMinDue ?? 0))
             return this.masterData?.loanLateFee ?? 0
