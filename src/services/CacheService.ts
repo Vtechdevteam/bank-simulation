@@ -126,7 +126,8 @@ class Service{
         (CacheService.getPreviousMonthTransaction(month)?.loanDue ?? 0) +
         this.getPreviousMonthLoanInterest(month) + 
         this.getPreviousMonthCreditCardInterest(month)+
-        this.getPreviousMonthCreditCardLateFee(month))*100)/100
+        this.getPreviousMonthCreditCardLateFee(month)+
+        this.getPreviousMonthLoanLateFee(month))*100)/100
     }
 
     getCurrentMonthCreditCardAndLoanBalanceDue(month: number) {
