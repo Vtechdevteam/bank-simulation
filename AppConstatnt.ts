@@ -10,7 +10,7 @@ if (typeof window !== "undefined") {
             break;
         }
         default: {
-            endpoint = "https://budget-genius.azurewebsites.net";
+            endpoint = "https://bank-game.azurewebsites.net";
         }
     }
 }
