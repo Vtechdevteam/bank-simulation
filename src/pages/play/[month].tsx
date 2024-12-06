@@ -38,7 +38,9 @@ const Page1 = () => {
             masterData: CacheService.masterData,
             userTransactions: CacheService.userTransactions,
             grace: CacheService.isGraceEnabled,
-            ip: await GlobalDataService.getIp()
+            ip: await GlobalDataService.getIp(),
+            totalBalance: CacheService.getPreviousMonthTotalBalanceDue(month),
+            surveyName: CacheService.masterData?.surveyName
         }
         const res = await GlobalDataService.submitResponse(data);
         console.log(res)
@@ -83,12 +85,14 @@ const Page1 = () => {
             "loanAllocation": getLoanAllocation(),
             "loanDue": getLoanDue(),
             "savings": getSavings(),
-            "creditCardLateFee": 0,
             "creditCardAPR": 0,
-            "loanLateFee": 0,
             "loanAPR": 0,
             "creditCardPenaltyAPR": 0,
-            "loanPenaltyAPR": 0
+            "loanPenaltyAPR": 0,
+            "creditCardInterest": CacheService.getPreviousMonthCreditCardInterest(month),
+            "loanInterest": CacheService.getPreviousMonthLoanInterest(month),
+            "creditCardLateFee": CacheService.getPreviousMonthCreditCardLateFee(month),
+            "loanLateFee": CacheService.getPreviousMonthLoanLateFee(month),
         }
         CacheService.setCurrentMonthTransaction(userTransaction)
         router.push("/play/" + (month + 1))

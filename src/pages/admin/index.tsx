@@ -25,7 +25,8 @@ const AddUpdateSettings = () => {
         loanLateFee: undefined,
         loanAPR: undefined,
         loanPenaltyAPR: undefined,
-        financeData: []
+        financeData: [],
+        surveyName: undefined
     })
     const validationSchema = Yup.object({
         numberOfMonths: Yup.number()
@@ -42,6 +43,8 @@ const AddUpdateSettings = () => {
             .required("This field is required!"),
         loanPenaltyAPR: Yup.number()
             .required("This field is required!"),
+        surveyName: Yup.string()
+            .required("This field is required!")
     })
     useEffect(() => {
         init()
@@ -85,7 +88,8 @@ const AddUpdateSettings = () => {
                     loanLateFee: undefined,
                     loanAPR: undefined,
                     loanPenaltyAPR: undefined,
-                    financeData: []
+                    financeData: [],
+                    surveyName: undefined
                 })
             }
         }
@@ -205,7 +209,7 @@ const AddUpdateSettings = () => {
                                             <div className="w-full grid grid-cols-1 md:grid-cols-5 gap-4">
                                                 <Input className="" name='numberOfMonths' label="No. of months" variant="bordered"
                                                     type="number"
-                                                    isReadOnly={!editable}
+                                                    isReadOnly={true}
                                                     value={String(formik?.values?.numberOfMonths)}
                                                     onChange={(e) => {
                                                         formik?.setFieldValue('numberOfMonths', Number(e.target.value))
@@ -235,6 +239,14 @@ const AddUpdateSettings = () => {
                                                     isInvalid={isFormFieldValid('numberOfMonths')}
                                                     color={isFormFieldValid('numberOfMonths') ? "danger" : "success"}
                                                     errorMessage={getFormErrorMessage('numberOfMonths')}
+                                                />
+                                                <Input className="col-span-1" name='surveyName' label="Survey Name" variant="bordered"
+                                                    type="text" value={String(formik?.values?.surveyName)}
+                                                    onChange={formik.handleChange}
+                                                    isReadOnly={!editable}
+                                                    isInvalid={isFormFieldValid('surveyName')}
+                                                    color={isFormFieldValid('surveyName') ? "danger" : "success"}
+                                                    errorMessage={getFormErrorMessage('surveyName')}
                                                 />
                                                 <Input className="col-span-1" name='creditCardLateFee' label="Credit Card late fee" variant="bordered"
                                                     type="number" value={String(formik?.values?.creditCardLateFee)}

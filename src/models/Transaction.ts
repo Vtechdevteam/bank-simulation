@@ -15,6 +15,7 @@ export interface MasterInformation {
     loanAPR?:                    number;
     loanPenaltyAPR?:             number;
     financeData?:                FinanceDatum[];
+    surveyName?:                 string;
 }
 
 export interface FinanceDatum {

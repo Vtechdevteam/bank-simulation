@@ -1,3 +1,5 @@
+import Router from "next/router"
+
 const Page1 = ({ setPage = async (page: number) => { } }: { setPage: any }) => {
     return (
         <div className="">
@@ -12,11 +14,10 @@ const Page1 = ({ setPage = async (page: number) => { } }: { setPage: any }) => {
             </p>
             <div className="flex justify-end">
                 <div role="button" className="font-semibold text-blue-600 cursor-pointer" onClick={() => {
-
-                    setPage(2)
+                    Router.push("/play/1")
                     window.scrollTo(0, 0)
 
-                }} >{`Next ->`}</div>
+                }} >{`Start ->`}</div>
             </div>
         </div>
 

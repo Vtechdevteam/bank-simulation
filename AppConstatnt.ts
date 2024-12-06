@@ -6,7 +6,7 @@ if (typeof window !== "undefined") {
             break;
         }
         case "localhost": {
-            endpoint = "http://localhost:8082";
+            endpoint = "http://localhost:8080";
             break;
         }
         default: {
