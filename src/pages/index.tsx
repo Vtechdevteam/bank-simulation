@@ -56,7 +56,7 @@ const Settings = () => {
       <div className="w-full h-screen bg-white">
         <div className="w-full flex justify-center mx-9 px-8 py-5 text-black">
           <div className="w-2/3 rounded-md shadow-lg px-6 py-4 my-8">
-            <h1 className="text-2xl font-semibold py-4">Budget Genius — The Economic Allocation Simulation</h1>
+            <h1 className="text-2xl font-semibold py-4">Budget Genius — The Financial Allocation Simulation</h1>
             {page === 1 && (
               <Page1 setPage={(page: number) => { setPage(page) }} />
             )}
