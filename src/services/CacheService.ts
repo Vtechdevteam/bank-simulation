@@ -46,6 +46,7 @@ class Service{
 
         let interest = this.masterData?.loanAPR
         let penaltyApr = this.masterData?.loanPenaltyAPR
+        let apr = this.masterData?.loanAPR
         // No grace period on loan
         // if((month == 6) && this.isGraceEnabled && forCalculation){
         //     interest = 0
@@ -56,6 +57,12 @@ class Service{
             return Calculator.calculateInterest(
                 this.getPreviousMonthTransaction(month)?.loanDue ?? 0,
                 penaltyApr ?? 0,
+                15
+            )
+        else if(((pmt?.loanAllocation ?? 0) < (this.getPreviousMonthTransaction(month)?.loanDue ?? 0) && month%2 != 0))
+            return Calculator.calculateInterest(
+                (this.getPreviousMonthTransaction(month)?.loanDue ?? 0) - (pmt?.loanAllocation ?? 0),
+                apr ?? 0,
                 15
             )
         return Calculator.calculateInterest(
@@ -71,6 +78,7 @@ class Service{
 
         let interest = this.masterData?.creditCardAPR
         let penaltyApr = this.masterData?.creditCardPenaltyAPR
+        let apr = this.masterData?.creditCardAPR
         if((month == 6) && this.isGraceEnabled && forCalculation){
             interest = 0
             return 0;
@@ -80,6 +88,12 @@ class Service{
             return Calculator.calculateInterest(
                 this.getPreviousMonthTransaction(month)?.creditCardDue ?? 0,
                 penaltyApr ?? 0,
+                15
+            )
+        else if(((pmt?.creditCardAllocation ?? 0) < (this.getPreviousMonthTransaction(month)?.creditCardDue ?? 0) && month%2 != 0))
+            return Calculator.calculateInterest(
+                (this.getPreviousMonthTransaction(month)?.creditCardDue ?? 0) - (pmt?.creditCardAllocation ?? 0),
+                apr ?? 0,
                 15
             )
         return Calculator.calculateInterest(
