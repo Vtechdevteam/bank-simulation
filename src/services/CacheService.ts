@@ -73,7 +73,7 @@ class Service{
         let interest = this.masterData?.creditCardAPR
         let penaltyApr = this.masterData?.creditCardPenaltyAPR
         let apr = this.masterData?.creditCardAPR
-        if(this.isGraceEnabled && forCalculation){
+        if((month == 6) && this.isGraceEnabled && forCalculation){
             interest = 0
             return 0;
         }
@@ -95,7 +95,7 @@ class Service{
         const pmt = this.getPreviousMonthTransaction(month)
         const pmfd = this.getPreviousFinanceData(month)
 
-        if(this.isGraceEnabled && forCalculation){
+        if((month == 6) && this.isGraceEnabled && forCalculation){
             return 0;
         }
 
