@@ -59,12 +59,6 @@ class Service{
                 penaltyApr ?? 0,
                 15
             )
-        else if(((pmt?.loanAllocation ?? 0) < (this.getPreviousMonthTransaction(month)?.loanDue ?? 0) && month%2 != 0))
-            return Calculator.calculateInterest(
-                (this.getPreviousMonthTransaction(month)?.loanDue ?? 0) - (pmt?.loanAllocation ?? 0),
-                apr ?? 0,
-                15
-            )
         return Calculator.calculateInterest(
             this.getPreviousMonthTransaction(month)?.loanDue ?? 0,
             interest ?? 0,
@@ -88,12 +82,6 @@ class Service{
             return Calculator.calculateInterest(
                 this.getPreviousMonthTransaction(month)?.creditCardDue ?? 0,
                 penaltyApr ?? 0,
-                15
-            )
-        else if(((pmt?.creditCardAllocation ?? 0) < (this.getPreviousMonthTransaction(month)?.creditCardDue ?? 0) && month%2 != 0))
-            return Calculator.calculateInterest(
-                (this.getPreviousMonthTransaction(month)?.creditCardDue ?? 0) - (pmt?.creditCardAllocation ?? 0),
-                apr ?? 0,
                 15
             )
         return Calculator.calculateInterest(
