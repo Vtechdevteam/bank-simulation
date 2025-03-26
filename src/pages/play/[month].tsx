@@ -95,6 +95,10 @@ const Page1 = () => {
             "loanLateFee": CacheService.getPreviousMonthLoanLateFee(month),
         }
         CacheService.setCurrentMonthTransaction(userTransaction)
+        // Calculate if grace candidate after 6th month beginning submission
+        if(month == 5){
+            CacheService.calculateIfGraceCandidate()
+        }
         router.push("/play/" + (month + 1))
     }
     const isFormFieldValid = (name: any) => ((formik as any).errors[name]);

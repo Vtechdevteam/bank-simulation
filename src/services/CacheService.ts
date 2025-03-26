@@ -8,14 +8,14 @@ class Service{
 
     userTransactions?: UserTransaction[] = []
 
-    isGraceEnabled = Math.round(Math.random()) == 0 ? false : true
+    isGraceEnabled = false
 
-    constructor(){
-        if(this.isGraceEnabled){
-            console.log("You are a grace candidate.")
-        }else{
-            console.log("You are non-grace candidate.")
+    calculateIfGraceCandidate() {
+        if((this.getPreviousMonthTransaction(6)?.creditCardAllocation ?? 0) < (this.getPreviousFinanceData(6)?.creditCardMinDue ?? 0)){
+            Math.random() > 0.5 ? this.isGraceEnabled = true : this.isGraceEnabled = false
         }
+        this.isGraceEnabled = false
+        console.log("Is Grace Enabled", this.isGraceEnabled)
     }
 
     async fetch(){
