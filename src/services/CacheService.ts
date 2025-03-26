@@ -12,9 +12,20 @@ class Service{
 
     calculateIfGraceCandidate() {
         if((this.getPreviousMonthTransaction(6)?.creditCardAllocation ?? 0) < (this.getPreviousFinanceData(6)?.creditCardMinDue ?? 0)){
-            Math.random() > 0.5 ? this.isGraceEnabled = true : this.isGraceEnabled = false
+            if(localStorage.getItem("isGraceEnabled") == "true"){
+                localStorage.setItem("isGraceEnabled", "false")
+                this.isGraceEnabled = false
+            }else if(localStorage.getItem("isGraceEnabled") == "false"){
+                localStorage.setItem("isGraceEnabled", "true")
+                this.isGraceEnabled = true
+            }else{
+                Math.random() > 0.5 ? this.isGraceEnabled = true : this.isGraceEnabled = false
+                localStorage.setItem("isGraceEnabled", this.isGraceEnabled.toString())
+            }
+        }else{
+            this.isGraceEnabled = false
+            localStorage.setItem("isGraceEnabled", "false")
         }
-        this.isGraceEnabled = false
         console.log("Is Grace Enabled", this.isGraceEnabled)
     }
 
